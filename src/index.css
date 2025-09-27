@@ -1,0 +1,18 @@
+@import 'tailwindcss';
+@reference "~/theme.css";
+
+@layer base {
+  #root {
+    @apply h-full;
+    @apply font-body;
+    @apply bg-neutral-800;
+    @apply text-neutral-200;
+  }
+
+  html,
+  body {
+    @apply h-full;
+    @apply select-none;
+    @apply font-body;
+  }
+}

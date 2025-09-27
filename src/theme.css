@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+@theme {
+  /*
+  Tools for generating a design system:
+  - https://tints.dev/
+  - https://colorpicker.me/
+  - https://uicolors.app/
+  */
+
+  /* Theme colours */
+  --color-primary: #a5bd69;
+  --color-background: #f3f4f6;
+
+  /* Tile selection colour scale */
+  --color-tile-1: #a5bd69;
+  --color-tile-2: #76a885;
+  --color-tile-3: #728999;
+  --color-tile-4: #7b6d8f;
+  --color-tile-5: #753f6a;
+
+  /* Fonts */
+  --font-body: 'Inter', 'Helvetica', sans-serif;
+  --font-code: 'DM Mono', 'Courier', monospace;
+}
