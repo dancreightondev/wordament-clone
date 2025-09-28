@@ -63,9 +63,14 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   }
 
   const handleSubmit = () => {
-    // Check if word is valid, and calculate its score if so
     const word = selectedIndices.map((i) => letters[i]).join('')
-    if (checkWordValidity(word)) {
+    if (
+      // Check if word is valid
+      checkWordValidity(word) &&
+      // Check if word has not already been submitted
+      !scoredWords.some(({ word: w }) => w === word)
+    ) {
+      // Calculate score
       const score = calculateWordScore(word)
       // Add word to scored words list
       setScoredWords((prev) => [...prev, { word, score }])
@@ -75,6 +80,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
     setSelectedIndices([])
     setTileCounts(Array(letters.length).fill(0))
   }
+
   return (
     <div className={twClassMerge('max-w-4xl p-4 mx-auto', className)} {...props}>
       <div id="upper" className="flex flex-col items-center m-4">
