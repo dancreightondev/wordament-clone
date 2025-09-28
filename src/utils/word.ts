@@ -1,8 +1,9 @@
 import { LETTER_VALUES } from '~/types/constants'
 
 const wordSet: Set<string> = new Set()
+const rudeWordSet: Set<string> = new Set()
 
-export const loadWordsFromFile = async (filePath: string): Promise<void> => {
+export const loadWordsToSet = async (filePath: string, targetSet: Set<string>): Promise<void> => {
   let wordsInFile = 0 // track word count for logging purposes
   const response = await fetch(filePath)
   if (!response.ok) {
@@ -13,7 +14,7 @@ export const loadWordsFromFile = async (filePath: string): Promise<void> => {
   text.split('\n').forEach((word) => {
     const w = word.trim().toLowerCase()
     if (w) {
-      wordSet.add(w)
+      targetSet.add(w)
       wordsInFile = wordsInFile + 1
     }
   })
@@ -21,8 +22,9 @@ export const loadWordsFromFile = async (filePath: string): Promise<void> => {
 }
 
 export const loadDictionary = async (): Promise<Set<string>> => {
-  await loadWordsFromFile('/src/assets/dictionary.txt')
-  await loadWordsFromFile('/src/assets/custom_words.txt')
+  await loadWordsToSet('/src/assets/dictionary.txt', wordSet)
+  await loadWordsToSet('/src/assets/custom_words.txt', wordSet)
+  await loadWordsToSet('/src/assets/rude_words.txt', rudeWordSet)
   console.info(`Total words in dictionary: ${wordSet.size}`)
   return wordSet
 }
@@ -36,6 +38,11 @@ export const checkWordValidity = (word: string, minLength: number = 3): boolean 
   // Check word is minimum length, default 3
   if (word.length < minLength) {
     console.log(`${word} is too short to be a valid word`)
+    return false
+  }
+  // Check word is NOT in rude words list
+  if (rudeWordSet.has(word.toLowerCase())) {
+    console.log(`${word} is considered profane or inappropriate`)
     return false
   }
   // Check word is in the dictionary
