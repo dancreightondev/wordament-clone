@@ -75,7 +75,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
     setTileCounts(Array(letters.length).fill(0))
   }
   return (
-    <div className={twClassMerge('max-w-4xl p-4', className)} {...props}>
+    <div className={twClassMerge('max-w-4xl p-4 mx-auto', className)} {...props}>
       <div id="upper" className="flex flex-col items-center m-4">
         <span>{selectedIndices.length > 0 ? 'Selected letters' : '\u00A0'}</span>
         <span className="min-h-[2rem] flex items-center">
