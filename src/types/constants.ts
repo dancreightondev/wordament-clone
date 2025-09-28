@@ -60,3 +60,31 @@ export const LETTER_DISTRIBUTION: Record<string, number> = {
 }
 
 export const VOWELS = ['A', 'E', 'I', 'O', 'U']
+
+export const DEFAULT_SETTINGS = {
+  theme: {
+    value: 'default',
+    key: 't', // t = theme
+    serializable: true // can be shared with seed or in URL
+  },
+  allowRudeWords: {
+    value: false,
+    key: 'p', // p = profanity
+    serializable: true
+  },
+  guaranteeRareLetter: {
+    value: false,
+    key: 'r', // r = rare
+    serializable: true
+  },
+  dyslexicMode: {
+    value: false,
+    key: 'd', // d = dyslexic
+    serializable: true
+  },
+  disableAnimations: {
+    value: false,
+    key: 'a', // a = animations
+    serializable: true
+  }
+}
