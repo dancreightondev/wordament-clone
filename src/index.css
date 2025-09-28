@@ -5,8 +5,9 @@
   #root {
     @apply h-full;
     @apply font-body;
-    @apply text-body;
-    @apply bg-background;
+    @apply text-lg;
+    @apply text-body-200;
+    @apply bg-body-950;
   }
 
   html,

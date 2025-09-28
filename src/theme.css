@@ -1,25 +1,50 @@
 @import 'tailwindcss';
 
 @theme {
-  /*
-  Tools for generating a design system:
-  - https://tints.dev/
-  - https://colorpicker.me/
-  - https://uicolors.app/
+  /* 
+  *  First, create a tile selection colour scale similar to one at the link below:
+  *  https://hihayk.github.io/scale/#1/4/90/45/-120/180/90/-60/45B4B9/154/40/40/d-0
+  *  Tweak as necessary until you get a colour scale you like.
   */
+  --color-tile-1: #45b4b9;
+  --color-tile-2: #4ecd73;
+  --color-tile-3: #96dd5b;
+  --color-tile-4: #ebd06a;
+  --color-tile-5: #f5817c;
 
-  /* Theme colours */
-  --color-primary: #a5bd69;
-  --color-body: #cfd4dd;
-  --color-foreground: #8d99ae;
-  --color-background: #2b2d42;
+  /* 
+  *  Then go to https://tints.dev/ ...
+  *  ... and paste in the darkest colour from the first website, locking it to 950.
+  *  This will generate a body colour scale.
+  */
+  --color-body-50: #f2f2f2;
+  --color-body-100: #e8e8e8;
+  --color-body-200: #cfcfcf;
+  --color-body-300: #b8b8b8;
+  --color-body-400: #9e9e9e;
+  --color-body-500: #878787;
+  --color-body-600: #726a71;
+  --color-body-700: #5d505c;
+  --color-body-800: #443743;
+  --color-body-900: #2b212b;
+  --color-body-950: #1e151e;
 
-  /* Tile selection colour scale */
-  --color-tile-1: #a5bd69;
-  --color-tile-2: #76a885;
-  --color-tile-3: #728999;
-  --color-tile-4: #7b6d8f;
-  --color-tile-5: #753f6a;
+  /*
+  *  Finally, in a new https://tints.dev/ palette...
+  *  ... paste in the first tile colour (--color-tile-1), locking it to 500.
+  *  This will generate a primary colour scale.
+  */
+  --color-primary-50: #eff4f6;
+  --color-primary-100: #ddebee;
+  --color-primary-200: #bad9de;
+  --color-primary-300: #95cad0;
+  --color-primary-400: #6ebdc4;
+  --color-primary-500: #45b4b9;
+  --color-primary-600: #3b8a91;
+  --color-primary-700: #2f646a;
+  --color-primary-800: #214045;
+  --color-primary-900: #111f22;
+  --color-primary-950: #090f10;
 
   /* Fonts */
   --font-body: 'Inter', 'Helvetica', sans-serif;

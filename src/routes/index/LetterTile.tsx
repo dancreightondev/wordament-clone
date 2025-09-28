@@ -1,61 +1,52 @@
-import { FC } from 'react'
+import { FC, forwardRef } from 'react'
 import { twClassMerge } from '~/utils/tailwind'
+import { VariantProps, cva } from 'class-variance-authority'
 
-interface LetterTileProps extends React.HTMLAttributes<HTMLDivElement> {
+const variants = cva(
+  // Styles shared between all variants
+  'rounded-lg size-18 flex mx-auto disabled:cursor-not-allowed disabled:opacity-25',
+  {
+    variants: {
+      selectedCount: {
+        0: 'bg-body-900',
+        1: 'bg-tile-1 text-body-950',
+        2: 'bg-tile-2 text-body-950',
+        3: 'bg-tile-3 text-body-950',
+        4: 'bg-tile-4 text-body-950',
+        5: 'bg-tile-5 text-body-950'
+      }
+    },
+    defaultVariants: {
+      selectedCount: 0
+    }
+  }
+)
+
+interface LetterTileProps
+  extends React.HTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof variants> {
   // Custom props go here
   letter: string
-  selectedCount: number
+  selectedCount: 0 | 1 | 2 | 3 | 4 | 5
   onClick: () => void
   disabled?: boolean
 }
 
-export const LetterTile: FC<LetterTileProps> = ({
-  letter,
-  selectedCount,
-  onClick,
-  disabled,
-  className,
-  ...props
-}) => {
-  let bgClass = ''
-  let textClass = ''
-  switch (selectedCount) {
-    case 1:
-      bgClass = 'bg-tile-1'
-      textClass = 'text-black/60'
-      break
-    case 2:
-      bgClass = 'bg-tile-2'
-      textClass = 'text-black/60'
-      break
-    case 3:
-      bgClass = 'bg-tile-3'
-      textClass = 'text-black/60'
-      break
-    case 4:
-      bgClass = 'bg-tile-4'
-      textClass = 'text-black/60'
-      break
-    case 5:
-      bgClass = 'bg-tile-5'
-      textClass = 'text-black/60'
-      break
-    default:
-      break
+const LetterTile: FC<LetterTileProps> = forwardRef<HTMLButtonElement, LetterTileProps>(
+  ({ selectedCount, letter, onClick, className, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={twClassMerge(variants({ selectedCount, className }), 'flex')}
+        {...props}
+        onClick={onClick}
+      >
+        <span className="w-full flex justify-center items-center text-3xl">{letter}</span>
+      </button>
+    )
   }
-  return (
-    <div
-      className={twClassMerge(
-        'rounded-lg border p-2 size-18 flex mx-auto',
-        disabled ? `cursor-not-allowed ${!selectedCount ? 'opacity-25' : ''}` : '',
-        bgClass,
-        textClass,
-        className
-      )}
-      {...props}
-      onClick={onClick}
-    >
-      <span className="w-full flex justify-center items-center text-2xl">{letter}</span>
-    </div>
-  )
-}
+)
+
+LetterTile.displayName = 'LetterTile'
+// eslint-disable-next-line react-refresh/only-export-components
+export { LetterTile, variants }

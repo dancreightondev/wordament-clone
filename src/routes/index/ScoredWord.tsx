@@ -12,13 +12,14 @@ export const ScoredWord: FC<ScoredWordProps> = ({ word, score, className, ...pro
     <li
       id={`scored-word-${word}`}
       className={twClassMerge(
-        'flex justify-between items-center px-2 py-1 bg-black/40 rounded',
+        'flex justify-between items-center px-3 py-2 bg-body-900 rounded-md',
         className
       )}
       {...props}
     >
       <span className="font-mono">{word}</span>
-      <span className="text-primary font-semibold">{score} pts</span>
+      <span className="text-primary-500 font-semibold">{score} pts</span>
+      {/* TODO: Magnifying glass button to look up word */}
     </li>
   )
 }

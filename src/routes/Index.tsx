@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import { FC, useState, useEffect, useRef } from 'react'
+import { Button } from '~/components/Button'
 import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
 import { generateGridLetters, stringToSeed } from '~/utils/grid'
@@ -89,18 +90,42 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
       setVMsg(wordValidity.msg)
     }
 
+    // Show message for 3 seconds
+    setShowVMsg(true)
+    if (vMsgTimerRef.current) clearTimeout(vMsgTimerRef.current)
+    vMsgTimerRef.current = setTimeout(() => {
+      setShowVMsg(false)
+    }, 3000)
+
     // Clear selection
     setSelectedIndices([])
     setTileCounts(Array(letters.length).fill(0))
   }
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (vMsgTimerRef.current) clearTimeout(vMsgTimerRef.current)
+    }
+  }, [])
+
   return (
     <div className={twClassMerge('max-w-4xl p-4 mx-auto', className)} {...props}>
-      <div id="upper" className="flex flex-col items-center m-4">
-        <span>{selectedIndices.length > 0 ? 'Selected letters' : '\u00A0'}</span>
-        <span className="min-h-[2rem] flex items-center">
-          {selectedIndices.length > 0 ? selectedIndices.map((i) => letters[i]).join('') : '\u00A0'}
-        </span>
+      <div id="upper" className="h-24 m-4">
+        {showVMsg ? (
+          <div id="validity-message" className="flex flex-col items-center text-center space-y-4">
+            {vMsg}
+          </div>
+        ) : (
+          <div id="selection" className="flex flex-col items-center space-y-4">
+            <span>{selectedIndices.length > 0 ? 'Selected letters' : '\u00A0'}</span>
+            <span className="min-h-[2rem] flex items-center text-2xl font-semibold text-primary-500">
+              {selectedIndices.length > 0
+                ? selectedIndices.map((i) => letters[i]).join('')
+                : '\u00A0'}
+            </span>
+          </div>
+        )}
       </div>
       <div
         id="tiles"
@@ -134,27 +159,31 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
             <LetterTile
               key={i}
               letter={letter}
-              selectedCount={tileCounts[i]}
+              selectedCount={tileCounts[i] as 0 | 1 | 2 | 3 | 4 | 5} // casting necessary for CVA to work
               onClick={() => handleTileSelect(i)}
               disabled={disabled}
             />
           )
         })}
       </div>
-      <div id="lower" className="flex flex-col items-center m-4">
-        <button onClick={handleSubmit}>Submit</button>
-        <div id="submitted-words" className="mt-6">
+      <div id="lower" className="flex flex-col items-center m-4 space-y-4">
+        <Button onClick={handleSubmit}>Submit word</Button>
+        <div id="submitted-words">
           <ul
-            className="space-y-1 w-52 overflow-y-auto max-h-52 no-scrollbar"
+            className="space-y-1 w-64 overflow-y-auto max-h-64 no-scrollbar"
             ref={(el) => {
               if (el) {
                 el.scrollTop = el.scrollHeight
               }
             }}
           >
-            {scoredWords.map(({ word, score }, idx) => (
-              <ScoredWord key={idx} word={word} score={score} className="w-full" />
-            ))}
+            {scoredWords.length === 0 ? (
+              <li className="text-center text-body-500">No words found</li>
+            ) : (
+              scoredWords.map(({ word, score }, idx) => (
+                <ScoredWord key={idx} word={word} score={score} className="w-full" />
+              ))
+            )}
           </ul>
         </div>
       </div>
