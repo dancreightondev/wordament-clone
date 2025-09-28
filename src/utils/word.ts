@@ -29,26 +29,29 @@ export const loadDictionary = async (): Promise<Set<string>> => {
   return wordSet
 }
 
-export const checkWordValidity = (word: string, minLength: number = 3): boolean => {
+export const checkWordValidity = (
+  word: string,
+  minLength: number = 3
+): { isValid: boolean; msg: string } => {
   // Check word is non-empty
   if (!word) {
     console.log('Cannot submit an empty word')
-    return false
+    return { isValid: false, msg: 'Cannot submit an empty word' }
   }
   // Check word is minimum length, default 3
   if (word.length < minLength) {
     console.log(`${word} is too short to be a valid word`)
-    return false
+    return { isValid: false, msg: `${word} is too short to be a valid word` }
   }
   // Check word is NOT in rude words list
   if (rudeWordSet.has(word.toLowerCase())) {
     console.log(`${word} is considered profane or inappropriate`)
-    return false
+    return { isValid: false, msg: `${word} is considered profane or inappropriate` }
   }
   // Check word is in the dictionary
   const isValid = wordSet.has(word.toLowerCase())
   console.log(`${word} is ${isValid ? '' : 'not '}a valid word`)
-  return isValid
+  return { isValid, msg: isValid ? `${word} is valid` : `${word} is not a valid word` }
 }
 
 export const calculateWordScore = (word: string): number => {

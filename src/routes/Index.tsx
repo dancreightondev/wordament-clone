@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import { FC, useState, useEffect } from 'react'
+import { FC, useState, useEffect, useRef } from 'react'
 import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
 import { generateGridLetters, stringToSeed } from '~/utils/grid'
@@ -14,14 +14,21 @@ const GRID_SIZE: number = 4 // should be restricted to 4, 5 or 6
 const VOWEL_COUNT: number = GRID_SIZE * 2 - 3 // 2x-3 is a heuristic formula for reasonable vowel count
 
 export const Index: FC<IndexProps> = ({ className, ...props }) => {
+  // Variables used to generate letter grid
   const [seedString, setSeedString] = useState<string>('default')
   const seed = stringToSeed(seedString)
   const letters = generateGridLetters(GRID_SIZE, seed, VOWEL_COUNT)
 
+  // Variables used when selecting tiles
   const [tileCounts, setTileCounts] = useState<number[]>(Array(letters.length).fill(0))
   const [selectedIndices, setSelectedIndices] = useState<number[]>([])
   const lastSelected = selectedIndices[selectedIndices.length - 1]
 
+  // Variables used when submitting words
+  // vMsg = validity message
+  const [showVMsg, setShowVMsg] = useState<boolean>(false)
+  const [vMsg, setVMsg] = useState<string>('')
+  const vMsgTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [scoredWords, setScoredWords] = useState<{ word: string; score: number }[]>([])
 
   // Load dictionary on mount
@@ -64,9 +71,10 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
 
   const handleSubmit = () => {
     const word = selectedIndices.map((i) => letters[i]).join('')
+    const wordValidity = checkWordValidity(word)
     if (
       // Check if word is valid
-      checkWordValidity(word) &&
+      wordValidity.isValid &&
       // Check if word has not already been submitted
       !scoredWords.some(({ word: w }) => w === word)
     ) {
@@ -74,6 +82,11 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
       const score = calculateWordScore(word)
       // Add word to scored words list
       setScoredWords((prev) => [...prev, { word, score }])
+
+      // Send message to frontend depending on validity
+      setVMsg(`+${score}`)
+    } else {
+      setVMsg(wordValidity.msg)
     }
 
     // Clear selection
