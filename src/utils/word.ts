@@ -22,9 +22,9 @@ export const loadWordsToSet = async (filePath: string, targetSet: Set<string>): 
 }
 
 export const loadDictionary = async (): Promise<Set<string>> => {
-  await loadWordsToSet('/src/assets/dictionary.txt', wordSet)
-  await loadWordsToSet('/src/assets/custom_words.txt', wordSet)
-  await loadWordsToSet('/src/assets/rude_words.txt', rudeWordSet)
+  await loadWordsToSet('/dictionary.txt', wordSet)
+  await loadWordsToSet('/custom_words.txt', wordSet)
+  await loadWordsToSet('/rude_words.txt', rudeWordSet)
   console.info(`Total words in dictionary: ${wordSet.size}`)
   return wordSet
 }
