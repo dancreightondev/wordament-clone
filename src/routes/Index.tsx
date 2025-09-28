@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 import { FC, useState, useEffect } from 'react'
 import { LetterTile } from '~/routes/index/LetterTile'
+import { ScoredWord } from '~/routes/index/ScoredWord'
 import { generateGridLetters, stringToSeed } from '~/utils/grid'
 import { twClassMerge } from '~/utils/tailwind'
 import { calculateWordScore, checkWordValidity, loadDictionary } from '~/utils/word'
@@ -124,16 +125,16 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
       <div id="lower" className="flex flex-col items-center m-4">
         <button onClick={handleSubmit}>Submit</button>
         <div id="submitted-words" className="mt-6">
-          <h2 className="text-lg font-bold mb-2">Submitted Words</h2>
-          <ul className="space-y-1">
+          <ul
+            className="space-y-1 w-52 overflow-y-auto max-h-52 no-scrollbar"
+            ref={(el) => {
+              if (el) {
+                el.scrollTop = el.scrollHeight
+              }
+            }}
+          >
             {scoredWords.map(({ word, score }, idx) => (
-              <li
-                key={idx}
-                className="flex justify-between items-center px-2 py-1 bg-neutral-950 rounded"
-              >
-                <span className="font-mono">{word}</span>
-                <span className="text-primary font-semibold">{score} pts</span>
-              </li>
+              <ScoredWord key={idx} word={word} score={score} className="w-full" />
             ))}
           </ul>
         </div>

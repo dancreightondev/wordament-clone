@@ -5,8 +5,8 @@
   #root {
     @apply h-full;
     @apply font-body;
-    @apply bg-neutral-800;
-    @apply text-neutral-200;
+    @apply text-body;
+    @apply bg-background;
   }
 
   html,
@@ -15,4 +15,8 @@
     @apply select-none;
     @apply font-body;
   }
+}
+
+@utility no-scrollbar {
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }

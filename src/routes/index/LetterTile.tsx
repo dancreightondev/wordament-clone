@@ -22,23 +22,23 @@ export const LetterTile: FC<LetterTileProps> = ({
   switch (selectedCount) {
     case 1:
       bgClass = 'bg-tile-1'
-      textClass = 'text-black'
+      textClass = 'text-black/60'
       break
     case 2:
       bgClass = 'bg-tile-2'
-      textClass = 'text-black'
+      textClass = 'text-black/60'
       break
     case 3:
       bgClass = 'bg-tile-3'
-      textClass = 'text-black'
+      textClass = 'text-black/60'
       break
     case 4:
       bgClass = 'bg-tile-4'
-      textClass = 'text-white'
+      textClass = 'text-black/60'
       break
     case 5:
       bgClass = 'bg-tile-5'
-      textClass = 'text-white'
+      textClass = 'text-black/60'
       break
     default:
       break
@@ -46,7 +46,7 @@ export const LetterTile: FC<LetterTileProps> = ({
   return (
     <div
       className={twClassMerge(
-        'border p-2 size-18 flex mx-auto',
+        'rounded-lg border p-2 size-18 flex mx-auto',
         disabled ? `cursor-not-allowed ${!selectedCount ? 'opacity-25' : ''}` : '',
         bgClass,
         textClass,

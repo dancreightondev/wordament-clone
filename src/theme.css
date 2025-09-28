@@ -10,7 +10,9 @@
 
   /* Theme colours */
   --color-primary: #a5bd69;
-  --color-background: #f3f4f6;
+  --color-body: #cfd4dd;
+  --color-foreground: #8d99ae;
+  --color-background: #2b2d42;
 
   /* Tile selection colour scale */
   --color-tile-1: #a5bd69;
@@ -21,5 +23,5 @@
 
   /* Fonts */
   --font-body: 'Inter', 'Helvetica', sans-serif;
-  --font-code: 'DM Mono', 'Courier', monospace;
+  --font-mono: 'DM Mono', 'Courier', monospace;
 }
