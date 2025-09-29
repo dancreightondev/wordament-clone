@@ -35,7 +35,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   // Load dictionary on mount
   useEffect(() => {
     loadDictionary()
-    const newSeed = new Date().getTime().toString()
+    const newSeed = Math.floor(new Date().getTime() ** 2 % 100000000).toString() // simple pseudo-random seed based on time
     setSeedString(newSeed)
     console.log(`Using seed string: ${newSeed}`)
   }, [])
@@ -113,6 +113,16 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
 
   return (
     <div className={twClassMerge('max-w-4xl p-4 mx-auto', className)} {...props}>
+      <header className="grid grid-cols-2">
+        <span id="header-left">
+          <span id="seed" className="text-sm text-body-700">
+            seed: {seedString}
+          </span>
+        </span>
+        <span id="header-right" className="text-right">
+          {/* menu button */}
+        </span>
+      </header>
       <div id="upper" className="h-24 m-4">
         {showVMsg ? (
           <div id="validity-message" className="flex flex-col items-center text-center space-y-4">
@@ -180,7 +190,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
             }}
           >
             {scoredWords.length === 0 ? (
-              <li className="text-center text-body-500">No words found</li>
+              <li className="text-center text-body-700">No words found</li>
             ) : (
               scoredWords.map(({ word, score }, idx) => (
                 <ScoredWord key={idx} word={word} score={score} className="w-full" />
