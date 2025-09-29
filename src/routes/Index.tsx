@@ -54,6 +54,8 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   }
 
   const handleTileSelect = (selectedTileIndex: number) => {
+    setShowVMsg(false) // hide validity message when selecting tiles
+
     // Deselect if clicking the last selected tile
     if (selectedIndices.length > 0 && selectedTileIndex === lastSelected) {
       setTileCounts((prev) =>
