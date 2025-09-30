@@ -115,7 +115,12 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
     <div className={twClassMerge('max-w-4xl p-4 mx-auto', className)} {...props}>
       <header className="grid grid-cols-2">
         <span id="header-left">
-          <span id="seed" className="text-sm text-body-700">
+          <span
+            id="seed"
+            className="text-sm text-body-700 cursor-pointer"
+            title="Click to copy"
+            onClick={() => navigator.clipboard.writeText(seedString)}
+          >
             seed: {seedString}
           </span>
         </span>
