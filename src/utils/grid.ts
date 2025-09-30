@@ -1,46 +1,5 @@
 import { LETTER_DISTRIBUTION, VOWELS } from '~/types/constants'
-
-/**
- * Converts a string to a `bigint` value.
- *
- * - If the seed is a valid integer string (including negative numbers), it is directly converted to `bigint`.
- * - Otherwise, the seed is hashed using a 32-bit signed integer hash function, and the result is converted to `bigint`.
- * - For negative hash values, the upper 32 bits are filled with 1s to preserve the sign.
- *
- * @param seedString - The string to convert to a `bigint` seed value.
- * @returns The corresponding `bigint` value derived from the seed.
- */
-export const stringToSeed = (seedString: string): bigint => {
-  // Check if the seed is a valid integer string (including negative numbers)
-  const numericMatch = /^-?\d+$/.exec(seedString.trim())
-  if (numericMatch) {
-    // If so, convert directly to BigInt
-    return BigInt(numericMatch[0])
-  }
-
-  // Hash function: generates a 32-bit signed integer from the string
-  const hashCode = (str: string): number => {
-    let h = 0
-    for (let i = 0; i < str.length; i++) {
-      h = (31 * h + str.charCodeAt(i)) | 0 // "| 0" forces 32‑bit overflow
-    }
-    return h
-  }
-
-  const intHash = hashCode(seedString)
-  return intHash >= 0 ? BigInt(intHash) : BigInt(intHash) | (BigInt(1) << 32n)
-}
-
-/**
- * Deterministic pseudo-random number generator.
- */
-const makeRand = (seed: bigint) => {
-  let s = seed
-  return (max: number) => {
-    s = (s * 48271n) % 2147483647n
-    return Number(s % BigInt(max))
-  }
-}
+import { lcrng } from '~/utils/number'
 
 /**
  * Places vowels in the grid, respecting maxDuplicates.
@@ -117,7 +76,7 @@ export const generateGridLetters = (
     for (let i = 0; i < count; i++) pool.push(letter)
   })
 
-  const rand = makeRand(seed)
+  const rand = lcrng(seed)
   const letterCounts: Record<string, number> = {}
 
   // Place vowels first
