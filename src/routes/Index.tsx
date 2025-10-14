@@ -3,6 +3,7 @@ import { FC, useState, useEffect, useRef } from 'react'
 import { Button } from '~/components/Button'
 import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
+import { Score } from '~/routes/index/Score'
 import { generateGridLetters } from '~/utils/grid'
 import { stringToSeed } from '~/utils/seed'
 import { twClassMerge } from '~/utils/tailwind'
@@ -32,6 +33,11 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   const [vMsg, setVMsg] = useState<string>('')
   const vMsgTimerRef = useRef<NodeJS.Timeout | null>(null)
   const [scoredWords, setScoredWords] = useState<{ word: string; score: number }[]>([])
+  const [score, setScore] = useState<number>(0)
+
+  // Animation toggle
+  // TODO: load from settings, userprefs, cookie, something like that
+  const [animate] = useState<boolean>(true)
 
   // Load dictionary on mount
   useEffect(() => {
@@ -83,12 +89,16 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
       !scoredWords.some(({ word: w }) => w === word)
     ) {
       // Calculate score
-      const score = calculateWordScore(word)
+      const wordScore = calculateWordScore(word)
       // Add word to scored words list
-      setScoredWords((prev) => [...prev, { word, score }])
+      setScoredWords((prev) => [...prev, { word, score: wordScore }])
+
+      // Update overall score
+      const updatedScore = score + wordScore
+      setScore(updatedScore)
 
       // Send message to frontend depending on validity
-      setVMsg(`+${score}`)
+      setVMsg(`+${wordScore}`)
     } else {
       setVMsg(wordValidity.msg)
     }
@@ -113,98 +123,99 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   }, [])
 
   return (
-    <div className={twClassMerge('max-w-4xl p-4 mx-auto', className)} {...props}>
-      <header className="grid grid-cols-2">
-        <span id="header-left">
-          <span
-            id="seed"
-            className="text-sm text-body-700 cursor-pointer"
-            title="Click to copy"
-            onClick={() => navigator.clipboard.writeText(seedString)}
-          >
-            seed: {seedString}
-          </span>
+    <div
+      className={twClassMerge('flex flex-col min-h-screen max-w-4xl mx-auto p-4', className)}
+      {...props}
+    >
+      {/* Header with seed and (future) menu */}
+      <header className="flex justify-between items-center mb-4">
+        <span
+          id="seed"
+          className="text-sm text-body-700 cursor-pointer"
+          title="Click to copy"
+          onClick={() => navigator.clipboard.writeText(seedString)}
+        >
+          seed: {seedString}
         </span>
-        <span id="header-right" className="text-right">
-          {/* menu button */}
-        </span>
+        <span>{/* menu button or settings toggle here */}</span>
       </header>
-      <div id="upper" className="h-24 m-4">
-        {showVMsg ? (
-          <div id="validity-message" className="flex flex-col items-center text-center space-y-4">
-            {vMsg}
-          </div>
-        ) : (
-          <div id="selection" className="flex flex-col items-center space-y-4">
-            <span>{selectedIndices.length > 0 ? 'Selected letters' : '\u00A0'}</span>
-            <span className="min-h-[2rem] flex items-center text-2xl font-semibold text-primary-500">
-              {selectedIndices.length > 0
-                ? selectedIndices.map((i) => letters[i]).join('')
-                : '\u00A0'}
-            </span>
-          </div>
-        )}
-      </div>
-      <div
-        id="tiles"
-        className={twClassMerge(
-          'grid gap-1 w-fit mx-auto',
-          (() => {
-            switch (GRID_SIZE) {
-              case 6:
-                return 'grid-cols-6 grid-rows-6'
-              case 5:
-                return 'grid-cols-5 grid-rows-5'
-              default:
-                return 'grid-cols-4 grid-rows-4'
-            }
-          })()
-        )}
-        style={{ aspectRatio: '1 / 1' }}
-      >
-        {letters.map((letter, i) => {
-          let disabled = false
-          // Prevent selecting the last selected tile again immediately (unless for deselect)
-          if (i === lastSelected) {
-            disabled = false // allow for deselect
-          } else if (selectedIndices.length === 0) {
-            disabled = false
-          } else {
-            disabled = !isAdjacent(lastSelected, i, GRID_SIZE)
-          }
-
-          return (
-            <LetterTile
-              key={i}
-              letter={letter}
-              selectedCount={tileCounts[i] as 0 | 1 | 2 | 3 | 4 | 5} // casting necessary for CVA to work
-              onClick={() => handleTileSelect(i)}
-              disabled={disabled}
-            />
-          )
-        })}
-      </div>
-      <div id="lower" className="flex flex-col items-center m-4 space-y-4">
-        <Button onClick={handleSubmit}>Submit word</Button>
-        <div id="submitted-words">
-          <ul
-            className="space-y-1 w-64 overflow-y-auto max-h-64 no-scrollbar"
-            ref={(el) => {
-              if (el) {
-                el.scrollTop = el.scrollHeight
-              }
-            }}
-          >
-            {scoredWords.length === 0 ? (
-              <li className="text-center text-body-700">No words found</li>
-            ) : (
-              scoredWords.map(({ word, score }, idx) => (
-                <ScoredWord key={idx} word={word} score={score} className="w-full" />
-              ))
-            )}
-          </ul>
+      <main className="flex flex-col items-center flex-1 w-full">
+        {/* Score and validity/selection message area */}
+        <div id="upper" className="w-full flex flex-col items-center mb-4">
+          <Score score={score} animated={animate} />
+          {showVMsg ? (
+            <div
+              id="validity-message"
+              className="flex flex-col items-center text-center space-y-4 mt-2"
+            >
+              {vMsg}
+            </div>
+          ) : (
+            <div id="selection" className="flex flex-col items-center space-y-2 mt-2">
+              <span>{selectedIndices.length > 0 ? 'Selected letters' : '\u00A0'}</span>
+              <span className="min-h-[2rem] flex items-center text-2xl font-semibold text-primary-500">
+                {selectedIndices.length > 0
+                  ? selectedIndices.map((i) => letters[i]).join('')
+                  : '\u00A0'}
+              </span>
+            </div>
+          )}
         </div>
-      </div>
+        {/* Letter grid */}
+        <div
+          id="tiles"
+          className={twClassMerge(
+            'grid gap-1 w-fit mx-auto mb-4',
+            {
+              6: 'grid-cols-6 grid-rows-6',
+              5: 'grid-cols-5 grid-rows-5',
+              4: 'grid-cols-4 grid-rows-4'
+            }[GRID_SIZE]
+          )}
+          style={{ aspectRatio: '1 / 1' }}
+        >
+          {letters.map((letter, i) => {
+            let disabled = false
+            // Prevent selecting the last selected tile again immediately (unless for deselect)
+            if (i === lastSelected) {
+              disabled = false // allow for deselect
+            } else if (selectedIndices.length === 0) {
+              disabled = false
+            } else {
+              disabled = !isAdjacent(lastSelected, i, GRID_SIZE)
+            }
+            return (
+              <LetterTile
+                key={i}
+                letter={letter}
+                selectedCount={tileCounts[i] as 0 | 1 | 2 | 3 | 4 | 5} // casting necessary for CVA to work
+                onClick={() => handleTileSelect(i)}
+                disabled={disabled}
+              />
+            )
+          })}
+        </div>
+        {/* Lower section: submit button and scored words */}
+        <div id="lower" className="flex flex-col items-center w-full space-y-4">
+          <Button onClick={handleSubmit}>Submit word</Button>
+          <div id="submitted-words" className="w-full flex flex-col items-center">
+            <ul
+              className="space-y-1 w-64 overflow-y-auto max-h-64 no-scrollbar"
+              ref={(el) => {
+                if (el) el.scrollTop = el.scrollHeight
+              }}
+            >
+              {scoredWords.length === 0 ? (
+                <li className="text-center text-body-700">No words found</li>
+              ) : (
+                scoredWords.map(({ word, score }, idx) => (
+                  <ScoredWord key={idx} word={word} score={score} className="w-full" />
+                ))
+              )}
+            </ul>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
