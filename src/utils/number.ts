@@ -20,7 +20,7 @@ export const hashCode = (str: string): number => {
  * Creates a linear congruential random number generator function.
  *
  * @param seed - The initial seed value as a `bigint`.
- * @returns A function that, when called with a maximum value, returns a pseudo-random integer in the range [0, max).
+ * @returns A function that, when called with a maximum value, returns a pseudo-random integer in the range [0, max].
  *
  * @example
  * const rand = lcrng(12345n);
