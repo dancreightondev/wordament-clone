@@ -51,7 +51,10 @@ export const checkWordValidity = (
   // Check word is in the dictionary
   const isValid = wordSet.has(word.toLowerCase())
   console.log(`${word} is ${isValid ? '' : 'not '}a valid word`)
-  return { isValid, msg: isValid ? `${word} is valid` : `${word} is not a valid word` }
+  return {
+    isValid,
+    msg: isValid ? `${word} has already been scored` : `${word} is not a valid word`
+  }
 }
 
 export const calculateWordScore = (word: string): number => {
