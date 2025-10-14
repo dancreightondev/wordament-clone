@@ -3,6 +3,7 @@ import { FC, useState, useEffect, useRef } from 'react'
 import { Button } from '~/components/Button'
 import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
+import { ScoredPoints } from '~/routes/index/ScoredPoints'
 import { Score } from '~/routes/index/Score'
 import { generateGridLetters } from '~/utils/grid'
 import { stringToSeed } from '~/utils/seed'
@@ -32,8 +33,12 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   const [showVMsg, setShowVMsg] = useState<boolean>(false)
   const [vMsg, setVMsg] = useState<string>('')
   const vMsgTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const [scoredWords, setScoredWords] = useState<{ word: string; score: number }[]>([])
+
+  // Variables used to display score UI
   const [score, setScore] = useState<number>(0)
+  const [scoredWords, setScoredWords] = useState<{ word: string; score: number }[]>([])
+  const [showScoredPoints, setShowScoredPoints] = useState<boolean>(false)
+  const [lastScoredPoints, setLastScoredPoints] = useState<number>(0)
 
   // Animation toggle
   // TODO: load from settings, userprefs, cookie, something like that
@@ -97,18 +102,22 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
       const updatedScore = score + wordScore
       setScore(updatedScore)
 
-      // Send message to frontend depending on validity
-      setVMsg(`+${wordScore}`)
-    } else {
-      setVMsg(wordValidity.msg)
-    }
+      // Update scored points UI
+      setLastScoredPoints(wordScore)
+      setShowScoredPoints(true)
 
-    // Show message for 3 seconds
-    setShowVMsg(true)
-    if (vMsgTimerRef.current) clearTimeout(vMsgTimerRef.current)
-    vMsgTimerRef.current = setTimeout(() => {
-      setShowVMsg(false)
-    }, 3000)
+      // If not valid and unique
+    } else {
+      // Show a validity message
+      setVMsg(wordValidity.msg)
+
+      // Show message for 3 seconds
+      setShowVMsg(true)
+      if (vMsgTimerRef.current) clearTimeout(vMsgTimerRef.current)
+      vMsgTimerRef.current = setTimeout(() => {
+        setShowVMsg(false)
+      }, 3000)
+    }
 
     // Clear selection
     setSelectedIndices([])
@@ -141,8 +150,16 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
       </header>
       <main className="flex flex-col items-center flex-1 w-full">
         {/* Score and validity/selection message area */}
-        <div id="upper" className="w-full flex flex-col items-center mb-4">
-          <Score score={score} animated={animate} />
+        <div id="upper" className="w-full flex flex-col items-center mb-4 h-32">
+          <div className="relative flex items-center justify-center">
+            <Score score={score} animated={animate} />
+            <ScoredPoints
+              points={lastScoredPoints}
+              visible={showScoredPoints}
+              animated={animate}
+              onDone={() => setShowScoredPoints(false)}
+            />
+          </div>
           {showVMsg ? (
             <div
               id="validity-message"
