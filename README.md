@@ -12,6 +12,12 @@ A browser-based clone of the story mode of Microsoft Wordament. There is no time
 - There is a new puzzle every day (at midnight UK time), the same for everybody. Each day has an objective, either reaching a score or finding a number of words, worked out from the words that can be found on that day's grid.
 - Only reasonably common words score or count towards the objective. Less common dictionary words are accepted, but not counted.
 
+## Planned
+
+- A landing page to choose between the **Daily puzzle** and **Practice**.
+- **Daily puzzle**: timed (10 minutes), with a leaderboard of scores.
+- **Practice**: untimed, with a random grid each time.
+
 ## Development
 
 ```sh

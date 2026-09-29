@@ -15,6 +15,11 @@
     @apply h-full;
     @apply select-none;
     @apply font-body;
+    @apply bg-body-950;
+    /* Stop pull-to-refresh and rubber-banding from disturbing drags, and remove touch delays */
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

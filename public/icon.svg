@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1e151e" />
+  <g font-family="Helvetica, Arial, sans-serif" font-weight="700" font-size="120" text-anchor="middle" fill="#1e151e">
+    <rect x="84" y="84" width="164" height="164" rx="28" fill="#45b4b9" />
+    <text x="166" y="204">W</text>
+    <rect x="264" y="84" width="164" height="164" rx="28" fill="#4ecd73" />
+    <text x="346" y="204">O</text>
+    <rect x="84" y="264" width="164" height="164" rx="28" fill="#ebd06a" />
+    <text x="166" y="384">R</text>
+    <rect x="264" y="264" width="164" height="164" rx="28" fill="#f5817c" />
+    <text x="346" y="384">D</text>
+  </g>
+</svg>
