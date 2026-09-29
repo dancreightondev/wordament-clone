@@ -5,7 +5,7 @@ import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
 import { ScoredPoints } from '~/routes/index/ScoredPoints'
 import { Score } from '~/routes/index/Score'
-import { generateGridLetters } from '~/utils/grid'
+import { generateGridLetters, isAdjacent } from '~/utils/grid'
 import { copyToClipboard } from '~/utils/clipboard'
 import { generateSeedString, stringToSeed } from '~/utils/seed'
 import { twClassMerge } from '~/utils/tailwind'
@@ -72,19 +72,6 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
     setSeedCopied(true)
     if (seedCopiedTimerRef.current) clearTimeout(seedCopiedTimerRef.current)
     seedCopiedTimerRef.current = setTimeout(() => setSeedCopied(false), 1500)
-  }
-
-  const isAdjacent = (iLast: number, iNew: number, gridSize: number) => {
-    if (iLast === undefined) return true // First selection allowed anywhere
-    const lastRow = Math.floor(iLast / gridSize)
-    const lastCol = iLast % gridSize
-    const newRow = Math.floor(iNew / gridSize)
-    const newCol = iNew % gridSize
-    return (
-      Math.abs(lastRow - newRow) <= 1 &&
-      Math.abs(lastCol - newCol) <= 1 &&
-      !(lastRow === newRow && lastCol === newCol)
-    )
   }
 
   const handleTileSelect = (selectedTileIndex: number) => {

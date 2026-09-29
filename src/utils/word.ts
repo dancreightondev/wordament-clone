@@ -2,6 +2,7 @@ import { LETTER_VALUES } from '~/types/constants'
 
 const wordSet: Set<string> = new Set()
 const rudeWordSet: Set<string> = new Set()
+const commonWordSet: Set<string> = new Set()
 
 /**
  * Fetches a newline-separated word list and adds its (lowercased) words to `targetSet`.
@@ -44,7 +45,8 @@ export const loadDictionary = (): Promise<Set<string>> => {
     dictionaryPromise = Promise.all([
       loadWordsToSet('/dictionary.txt', wordSet, true),
       loadWordsToSet('/custom_words.txt', wordSet),
-      loadWordsToSet('/rude_words.txt', rudeWordSet)
+      loadWordsToSet('/rude_words.txt', rudeWordSet),
+      loadWordsToSet('/common_words.txt', commonWordSet, true)
     ])
       .then(() => wordSet)
       .catch((error) => {
@@ -54,6 +56,15 @@ export const loadDictionary = (): Promise<Set<string>> => {
   }
   return dictionaryPromise
 }
+
+/**
+ * The words that count towards puzzle objectives (a subset of the dictionary).
+ * Other dictionary words are still accepted, but are not counted. Only available once
+ * `loadDictionary` has resolved.
+ */
+export const getCommonWords = (): ReadonlySet<string> => commonWordSet
+
+export const isCommonWord = (word: string): boolean => commonWordSet.has(word.toLowerCase())
 
 export type WordValidity = { isValid: true } | { isValid: false; msg: string }
 

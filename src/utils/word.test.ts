@@ -1,10 +1,11 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { calculateWordScore, checkWordValidity, loadDictionary } from '~/utils/word'
+import { calculateWordScore, checkWordValidity, isCommonWord, loadDictionary } from '~/utils/word'
 
 const files: Record<string, string> = {
   '/dictionary.txt': 'cat\ndog\nbadword\n',
   '/custom_words.txt': 'doot\n',
-  '/rude_words.txt': 'badword\n'
+  '/rude_words.txt': 'badword\n',
+  '/common_words.txt': 'cat\n'
 }
 
 beforeAll(async () => {
@@ -36,6 +37,13 @@ describe('checkWordValidity', () => {
       isValid: false,
       msg: expect.stringContaining('profane')
     })
+  })
+})
+
+describe('isCommonWord', () => {
+  it('only counts words in the common list, ignoring case', () => {
+    expect(isCommonWord('CAT')).toBe(true)
+    expect(isCommonWord('dog')).toBe(false)
   })
 })
 
