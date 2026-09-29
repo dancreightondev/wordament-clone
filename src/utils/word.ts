@@ -1,4 +1,5 @@
 import { LETTER_VALUES } from '~/types/constants'
+import { buildTrie, Trie } from '~/utils/solver'
 
 const wordSet: Set<string> = new Set()
 const rudeWordSet: Set<string> = new Set()
@@ -63,6 +64,11 @@ export const loadDictionary = (): Promise<Set<string>> => {
  * `loadDictionary` has resolved.
  */
 export const getCommonWords = (): ReadonlySet<string> => commonWordSet
+
+let commonTrie: Trie | null = null
+
+/** A trie of the common words, built on first use. Only available once `loadDictionary` has resolved. */
+export const getCommonTrie = (): Trie => (commonTrie ??= buildTrie(commonWordSet))
 
 export const isCommonWord = (word: string): boolean => commonWordSet.has(word.toLowerCase())
 
