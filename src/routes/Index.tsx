@@ -56,7 +56,6 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   const [dictionaryAttempt, setDictionaryAttempt] = useState<number>(0)
   useEffect(() => {
     let cancelled = false
-    setDictionaryStatus('loading')
     loadDictionary()
       .then(() => !cancelled && setDictionaryStatus('ready'))
       .catch((error) => {
@@ -214,15 +213,11 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
           style={{ aspectRatio: '1 / 1' }}
         >
           {letters.map((letter, i) => {
-            let disabled = false
-            // Prevent selecting the last selected tile again immediately (unless for deselect)
-            if (i === lastSelected) {
-              disabled = false // allow for deselect
-            } else if (selectedIndices.length === 0) {
-              disabled = false
-            } else {
-              disabled = !isAdjacent(lastSelected, i, GRID_SIZE)
-            }
+            // Only adjacent tiles can be selected, but the last selected tile stays enabled to allow deselecting
+            const disabled =
+              i !== lastSelected &&
+              selectedIndices.length > 0 &&
+              !isAdjacent(lastSelected, i, GRID_SIZE)
             return (
               <LetterTile
                 key={i}
@@ -245,7 +240,13 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
           {dictionaryStatus === 'error' && (
             <div role="alert" className="flex flex-col items-center space-y-2">
               <span>Could not load the dictionary.</span>
-              <Button size="sm" onClick={() => setDictionaryAttempt((n) => n + 1)}>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setDictionaryStatus('loading')
+                  setDictionaryAttempt((n) => n + 1)
+                }}
+              >
                 Try again
               </Button>
             </div>
