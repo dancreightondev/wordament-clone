@@ -26,7 +26,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
     [seedString]
   )
   const [seedCopied, setSeedCopied] = useState<boolean>(false)
-  const seedCopiedTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const seedCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Variables used to track loading of the dictionary
   const [dictionaryStatus, setDictionaryStatus] = useState<'loading' | 'ready' | 'error'>('loading')
@@ -40,7 +40,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   // vMsg = validity message
   const [showVMsg, setShowVMsg] = useState<boolean>(false)
   const [vMsg, setVMsg] = useState<string>('')
-  const vMsgTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const vMsgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Variables used to display score UI
   const [score, setScore] = useState<number>(0)
