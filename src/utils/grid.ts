@@ -55,7 +55,12 @@ const pickLetter = (
   ) {
     letter = pool[rand(pool.length)]
     attempts++
-    if (attempts > pool.length * 2) break // Prevent infinite loop
+    if (attempts > pool.length * 2) {
+      // Random picking failed to find a suitable letter, so choose deterministically instead:
+      // prefer a letter still under the cap, then any letter allowed by the vowel exclusion
+      const allowed = pool.filter((l) => !(excludeVowels && VOWELS.includes(l)))
+      return allowed.find((l) => (letterCounts[l] || 0) < maxDuplicates) ?? allowed[0] ?? letter
+    }
   }
   return letter
 }

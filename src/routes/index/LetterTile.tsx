@@ -23,21 +23,25 @@ const variants = cva(
 )
 
 interface LetterTileProps
-  extends React.HTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof variants> {
+  extends
+    Omit<React.HTMLAttributes<HTMLButtonElement>, 'onClick'>,
+    Omit<VariantProps<typeof variants>, 'selectedCount'> {
   // Custom props go here
   letter: string
-  selectedCount: 0 | 1 | 2 | 3 | 4 | 5
+  /** How many times the tile is in the current word. Tiles may be re-used, so any count is allowed. */
+  selectedCount: number
   onClick: () => void
   disabled?: boolean
 }
 
 const LetterTile: FC<LetterTileProps> = forwardRef<HTMLButtonElement, LetterTileProps>(
   ({ selectedCount, letter, onClick, className, ...props }, ref) => {
+    // Counts above 5 share the final colour (casting necessary for CVA to work)
+    const variantCount = Math.min(selectedCount, 5) as 0 | 1 | 2 | 3 | 4 | 5
     return (
       <button
         ref={ref}
-        className={twClassMerge(variants({ selectedCount, className }), 'flex')}
+        className={twClassMerge(variants({ selectedCount: variantCount, className }), 'flex')}
         {...props}
         onClick={onClick}
       >

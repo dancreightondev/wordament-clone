@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import { FC, useState, useEffect, useRef } from 'react'
+import { FC, useState, useEffect, useMemo, useRef } from 'react'
 import { Button } from '~/components/Button'
 import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
 import { ScoredPoints } from '~/routes/index/ScoredPoints'
 import { Score } from '~/routes/index/Score'
 import { generateGridLetters } from '~/utils/grid'
-import { stringToSeed } from '~/utils/seed'
+import { copyToClipboard } from '~/utils/clipboard'
+import { generateSeedString, stringToSeed } from '~/utils/seed'
 import { twClassMerge } from '~/utils/tailwind'
 import { calculateWordScore, checkWordValidity, loadDictionary } from '~/utils/word'
 
@@ -19,9 +20,16 @@ const VOWEL_COUNT: number = GRID_SIZE * 2 - 3 // 2x-3 is a heuristic formula for
 
 export const Index: FC<IndexProps> = ({ className, ...props }) => {
   // Variables used to generate letter grid
-  const [seedString, setSeedString] = useState<string>('default')
-  const seed = stringToSeed(seedString)
-  const letters = generateGridLetters(GRID_SIZE, seed, VOWEL_COUNT)
+  const [seedString] = useState<string>(generateSeedString)
+  const letters = useMemo(
+    () => generateGridLetters(GRID_SIZE, stringToSeed(seedString), VOWEL_COUNT),
+    [seedString]
+  )
+  const [seedCopied, setSeedCopied] = useState<boolean>(false)
+  const seedCopiedTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Variables used to track loading of the dictionary
+  const [dictionaryStatus, setDictionaryStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
   // Variables used when selecting tiles
   const [tileCounts, setTileCounts] = useState<number[]>(Array(letters.length).fill(0))
@@ -44,13 +52,28 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   // TODO: load from settings, userprefs, cookie, something like that
   const [animate] = useState<boolean>(true)
 
-  // Load dictionary on mount
+  // Load dictionary on mount, and again whenever a retry is requested
+  const [dictionaryAttempt, setDictionaryAttempt] = useState<number>(0)
   useEffect(() => {
+    let cancelled = false
+    setDictionaryStatus('loading')
     loadDictionary()
-    const newSeed = Math.floor(new Date().getTime() ** 2 % 100000000).toString() // simple pseudo-random seed based on time
-    setSeedString(newSeed)
-    console.log(`Using seed string: ${newSeed}`)
-  }, [])
+      .then(() => !cancelled && setDictionaryStatus('ready'))
+      .catch((error) => {
+        console.error('Failed to load dictionary', error)
+        if (!cancelled) setDictionaryStatus('error')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [dictionaryAttempt])
+
+  const handleCopySeed = async () => {
+    if (!(await copyToClipboard(seedString))) return
+    setSeedCopied(true)
+    if (seedCopiedTimerRef.current) clearTimeout(seedCopiedTimerRef.current)
+    seedCopiedTimerRef.current = setTimeout(() => setSeedCopied(false), 1500)
+  }
 
   const isAdjacent = (iLast: number, iNew: number, gridSize: number) => {
     if (iLast === undefined) return true // First selection allowed anywhere
@@ -85,14 +108,11 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
   }
 
   const handleSubmit = () => {
+    if (dictionaryStatus !== 'ready') return
     const word = selectedIndices.map((i) => letters[i]).join('')
     const wordValidity = checkWordValidity(word)
-    if (
-      // Check if word is valid
-      wordValidity.isValid &&
-      // Check if word has not already been submitted
-      !scoredWords.some(({ word: w }) => w === word)
-    ) {
+    const alreadyScored = scoredWords.some(({ word: w }) => w === word)
+    if (wordValidity.isValid && !alreadyScored) {
       // Calculate score
       const wordScore = calculateWordScore(word)
       // Add word to scored words list
@@ -109,7 +129,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
       // If not valid and unique
     } else {
       // Show a validity message
-      setVMsg(wordValidity.msg)
+      setVMsg(wordValidity.isValid ? `${word} has already been scored` : wordValidity.msg)
 
       // Show message for 3 seconds
       setShowVMsg(true)
@@ -124,10 +144,11 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
     setTileCounts(Array(letters.length).fill(0))
   }
 
-  // Cleanup timer on unmount
+  // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (vMsgTimerRef.current) clearTimeout(vMsgTimerRef.current)
+      if (seedCopiedTimerRef.current) clearTimeout(seedCopiedTimerRef.current)
     }
   }, [])
 
@@ -142,9 +163,10 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
           id="seed"
           className="text-sm text-body-700 cursor-pointer"
           title="Click to copy"
-          onClick={() => navigator.clipboard.writeText(seedString)}
+          onClick={handleCopySeed}
         >
           seed: {seedString}
+          {seedCopied && ' (copied)'}
         </span>
         <span>{/* menu button or settings toggle here */}</span>
       </header>
@@ -205,7 +227,7 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
               <LetterTile
                 key={i}
                 letter={letter}
-                selectedCount={tileCounts[i] as 0 | 1 | 2 | 3 | 4 | 5} // casting necessary for CVA to work
+                selectedCount={tileCounts[i]}
                 onClick={() => handleTileSelect(i)}
                 disabled={disabled}
               />
@@ -214,7 +236,20 @@ export const Index: FC<IndexProps> = ({ className, ...props }) => {
         </div>
         {/* Lower section: submit button and scored words */}
         <div id="lower" className="flex flex-col items-center w-full space-y-4">
-          <Button onClick={handleSubmit}>Submit word</Button>
+          <Button onClick={handleSubmit} disabled={dictionaryStatus !== 'ready'}>
+            Submit word
+          </Button>
+          {dictionaryStatus === 'loading' && (
+            <span className="text-body-400">Loading dictionary...</span>
+          )}
+          {dictionaryStatus === 'error' && (
+            <div role="alert" className="flex flex-col items-center space-y-2">
+              <span>Could not load the dictionary.</span>
+              <Button size="sm" onClick={() => setDictionaryAttempt((n) => n + 1)}>
+                Try again
+              </Button>
+            </div>
+          )}
           <div id="submitted-words" className="w-full flex flex-col items-center">
             <ul
               className="space-y-1 w-64 overflow-y-auto max-h-64 no-scrollbar"
