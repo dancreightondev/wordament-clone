@@ -18,7 +18,7 @@ export const Score: FC<ScoreProps> = ({ score, animated = false, className, ...p
         {animated ? (
           <motion.span
             key={score}
-            className="text-6xl font-bold inline-block"
+            className="text-5xl font-bold inline-block"
             initial={{ scale: 1.2, color: '#45b4b9' }}
             animate={{ scale: 1, color: '#fff' }}
             exit={{ scale: 0.8, opacity: 0 }}
@@ -27,7 +27,7 @@ export const Score: FC<ScoreProps> = ({ score, animated = false, className, ...p
             {score}
           </motion.span>
         ) : (
-          <span className="text-6xl font-bold">{score}</span>
+          <span className="text-5xl font-bold">{score}</span>
         )}
       </AnimatePresence>
     </div>

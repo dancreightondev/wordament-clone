@@ -55,7 +55,12 @@ const pickLetter = (
   ) {
     letter = pool[rand(pool.length)]
     attempts++
-    if (attempts > pool.length * 2) break // Prevent infinite loop
+    if (attempts > pool.length * 2) {
+      // Random picking failed to find a suitable letter, so choose deterministically instead:
+      // prefer a letter still under the cap, then any letter allowed by the vowel exclusion
+      const allowed = pool.filter((l) => !(excludeVowels && VOWELS.includes(l)))
+      return allowed.find((l) => (letterCounts[l] || 0) < maxDuplicates) ?? allowed[0] ?? letter
+    }
   }
   return letter
 }
@@ -101,4 +106,21 @@ export const generateGridLetters = (
   }
 
   return letters
+}
+
+/**
+ * Whether two tiles are adjacent (including diagonally). A tile is not adjacent to itself.
+ * If there is no previous tile (`iLast` is undefined), any tile is allowed.
+ */
+export const isAdjacent = (iLast: number | undefined, iNew: number, gridSize: number): boolean => {
+  if (iLast === undefined) return true // First selection allowed anywhere
+  const lastRow = Math.floor(iLast / gridSize)
+  const lastCol = iLast % gridSize
+  const newRow = Math.floor(iNew / gridSize)
+  const newCol = iNew % gridSize
+  return (
+    Math.abs(lastRow - newRow) <= 1 &&
+    Math.abs(lastCol - newCol) <= 1 &&
+    !(lastRow === newRow && lastCol === newCol)
+  )
 }

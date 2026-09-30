@@ -34,8 +34,7 @@ const variants = cva(
 )
 
 interface ButtonProps
-  extends React.HTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof variants> {
+  extends React.HTMLAttributes<HTMLButtonElement>, VariantProps<typeof variants> {
   // Custom props go here
   icon?: ReactNode
   disabled?: boolean

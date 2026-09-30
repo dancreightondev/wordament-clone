@@ -47,6 +47,6 @@
   --color-primary-950: #090f10;
 
   /* Fonts */
-  --font-body: 'Inter', 'Helvetica', sans-serif;
+  --font-body: 'Inter Variable', 'Inter', 'Helvetica', sans-serif;
   --font-mono: 'DM Mono', 'Courier', monospace;
 }

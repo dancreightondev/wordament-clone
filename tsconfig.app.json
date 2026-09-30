@@ -21,13 +21,12 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Import path aliases */
-    "baseUrl": "./src",
     "paths": {
-      "~/assets/*": ["./assets/*"],
-      "~/components/*": ["./components/*"],
-      "~/routes/*": ["./routes/*"],
-      "~/types/*": ["./types/*"],
-      "~/utils/*": ["./utils/*"]
+      "~/assets/*": ["./src/assets/*"],
+      "~/components/*": ["./src/components/*"],
+      "~/routes/*": ["./src/routes/*"],
+      "~/types/*": ["./src/types/*"],
+      "~/utils/*": ["./src/utils/*"]
     }
   },
   "include": ["src"]
