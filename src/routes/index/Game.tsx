@@ -365,6 +365,7 @@ export const Game: FC<GameProps> = ({
                   key={i}
                   data-tile={i}
                   letter={letter}
+                  value={calculateWordScore(letter)}
                   selectedCount={tileCounts[i]}
                   aria-label={`${letter}, row ${Math.floor(i / GRID_SIZE) + 1}, column ${(i % GRID_SIZE) + 1}`}
                   onClick={(e) => handleTileKeyboardClick(i, e)}

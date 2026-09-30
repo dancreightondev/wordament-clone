@@ -4,7 +4,7 @@ import { VariantProps, cva } from 'class-variance-authority'
 
 const variants = cva(
   // Styles shared between all variants. Tiles fill their grid cell and stay square.
-  'rounded-lg aspect-square w-full flex items-center justify-center font-medium leading-none aria-disabled:opacity-25',
+  'relative rounded-lg aspect-square w-full flex items-center justify-center font-medium leading-none aria-disabled:opacity-25',
   {
     variants: {
       selectedCount: {
@@ -28,6 +28,8 @@ interface LetterTileProps
     Omit<VariantProps<typeof variants>, 'selectedCount'> {
   // Custom props go here
   letter: string
+  /** The points the letter is worth, shown small in a corner of the tile. */
+  value?: number
   /** How many times the tile is in the current word. Tiles may be re-used, so any count is allowed. */
   selectedCount: number
   onClick: React.MouseEventHandler<HTMLButtonElement>
@@ -39,7 +41,7 @@ interface LetterTileProps
 }
 
 const LetterTile: FC<LetterTileProps> = forwardRef<HTMLButtonElement, LetterTileProps>(
-  ({ selectedCount, letter, onClick, unavailable = false, className, ...props }, ref) => {
+  ({ selectedCount, letter, value, onClick, unavailable = false, className, ...props }, ref) => {
     // Counts above 5 share the final colour (casting necessary for CVA to work)
     const variantCount = Math.min(selectedCount, 5) as 0 | 1 | 2 | 3 | 4 | 5
     return (
@@ -54,6 +56,14 @@ const LetterTile: FC<LetterTileProps> = forwardRef<HTMLButtonElement, LetterTile
       >
         {/* Font size is inherited from the grid, which scales it with the tile size */}
         <span className="text-[1em]">{letter}</span>
+        {value !== undefined && (
+          <span
+            className="absolute bottom-[8%] right-[10%] text-[0.4em] font-normal opacity-70"
+            aria-hidden="true"
+          >
+            {value}
+          </span>
+        )}
       </button>
     )
   }
