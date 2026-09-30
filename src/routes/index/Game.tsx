@@ -1,5 +1,5 @@
 import { FC, useState, useEffect, useMemo, useRef } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, MotionConfig, motion } from 'motion/react'
 import { Button } from '~/components/Button'
 import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
@@ -86,6 +86,13 @@ export const Game: FC<GameProps> = ({
   const [foundWords, setFoundWords] = useState<string[]>(() =>
     persist ? loadFoundWords(dateString) : []
   )
+  // The word added most recently, so that only its row animates in (not restored or older ones)
+  const [latestWord, setLatestWord] = useState<string | null>(null)
+  // New words are added at the top of the list, so scroll back up to show them
+  const wordListRef = useRef<HTMLUListElement>(null)
+  useEffect(() => {
+    wordListRef.current?.scrollTo({ top: 0 })
+  }, [foundWords.length])
   const countedWords = useMemo(() => foundWords.filter(isCommonWord), [foundWords])
   const score = totalScore(countedWords)
   const progress = objectiveProgress(objective, countedWords)
@@ -195,6 +202,7 @@ export const Game: FC<GameProps> = ({
       showMessage(result.msg, result.tone)
     } else {
       setFoundWords((prev) => [...prev, word])
+      setLatestWord(word)
       if (result.counted) {
         // Update scored points UI
         setLastScoredPoints(calculateWordScore(word))
@@ -376,31 +384,49 @@ export const Game: FC<GameProps> = ({
             {objective.type === 'words' && foundWords.length > 0 && (
               <div className="mb-1 flex w-full max-w-sm justify-between text-sm text-body-400">
                 <span>
-                  {progress} / {objective.target} words found
+                  {/* Keyed by value, so it pops each time the number changes */}
+                  <span
+                    key={progress}
+                    className={animate ? 'inline-block animate-counter-bump' : ''}
+                  >
+                    {progress}
+                  </span>{' '}
+                  / {objective.target} words found
                 </span>
-                <span>{score} pts total</span>
+                <span>
+                  <span key={score} className={animate ? 'inline-block animate-counter-bump' : ''}>
+                    {score}
+                  </span>{' '}
+                  pts total
+                </span>
               </div>
             )}
-            <ul
-              className="space-y-1 w-full max-w-sm overflow-y-auto max-h-48 no-scrollbar"
-              ref={(el) => {
-                if (el) el.scrollTop = el.scrollHeight
-              }}
-            >
-              {foundWords.length === 0 ? (
-                <li className="text-center text-body-700">No words found</li>
-              ) : (
-                foundWords.map((word) => (
-                  <ScoredWord
-                    key={word}
-                    word={word}
-                    score={isCommonWord(word) ? calculateWordScore(word) : 0}
-                    counted={isCommonWord(word)}
-                    className="w-full"
-                  />
-                ))
-              )}
-            </ul>
+            {/* Rows glide when a word is added, unless the device prefers reduced motion */}
+            <MotionConfig reducedMotion="user">
+              <ul
+                // Smooth scrolling, as the list scrolls back to the top when a word is added
+                className="space-y-1 w-full max-w-sm overflow-y-auto max-h-48 no-scrollbar scroll-smooth motion-reduce:scroll-auto"
+                ref={wordListRef}
+              >
+                {foundWords.length === 0 ? (
+                  <li className="text-center text-body-700">No words found</li>
+                ) : (
+                  // Newest first
+                  [...foundWords]
+                    .reverse()
+                    .map((word) => (
+                      <ScoredWord
+                        key={word}
+                        word={word}
+                        score={isCommonWord(word) ? calculateWordScore(word) : 0}
+                        counted={isCommonWord(word)}
+                        animated={animate && word === latestWord}
+                        className="w-full"
+                      />
+                    ))
+                )}
+              </ul>
+            </MotionConfig>
           </div>
         </div>
       </main>

@@ -26,3 +26,62 @@
 @utility no-scrollbar {
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
+
+/* A scored word joining the list: a primary coloured panel sweeps in from the left to cover the row,
+   holds for a moment, then sweeps out to the right, revealing the word and its points. The row's
+   content stays hidden until the panel covers it. Both take the same time so they stay in step. */
+@keyframes word-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  35%,
+  55% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* A word that does not count just fades in, to the row's own opacity. */
+@keyframes word-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes word-reveal {
+  0%,
+  45% {
+    opacity: 0;
+  }
+  46%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* A counter number ticking up: it pops and briefly turns primary coloured. Apply to an inline-block element. */
+@keyframes counter-bump {
+  from {
+    transform: scale(1.3);
+    color: --theme(--color-primary-500);
+  }
+}
+
+/* `forwards` keeps the panel off to the right afterwards. Without it, it would snap back over the row. */
+@utility animate-word-sweep {
+  animation: word-sweep 400ms ease-in-out forwards;
+}
+
+@utility animate-word-fade {
+  animation: word-fade 300ms ease-out;
+}
+
+@utility animate-word-reveal {
+  animation: word-reveal 400ms linear;
+}
+
+@utility animate-counter-bump {
+  animation: counter-bump 300ms ease-out;
+}
