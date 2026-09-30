@@ -35,6 +35,8 @@ interface GameProps extends React.HTMLAttributes<HTMLDivElement> {
   dateString: string
   /** Whether to save and restore found words. Zen mode games are not persisted. */
   persist?: boolean
+  /** Whether to show the seed, which the daily puzzle hides as it is just the date. */
+  showSeed?: boolean
   /** Called when the player asks to return to the landing page. */
   onExit?: () => void
 }
@@ -43,6 +45,7 @@ export const Game: FC<GameProps> = ({
   puzzle,
   dateString,
   persist = true,
+  showSeed = true,
   onExit,
   className,
   ...props
@@ -222,22 +225,24 @@ export const Game: FC<GameProps> = ({
     >
       {/* Header with seed and (future) menu */}
       <header className="flex justify-between items-center mb-1">
-        <span
-          id="seed"
-          className="h-10 flex items-center text-sm text-body-700 hover:text-primary-500 transition-colors duration-75 cursor-pointer"
-          title="Click to copy"
-          onClick={handleCopySeed}
-        >
-          seed: {seedString}
-          {seedCopied && ' (copied)'}
-        </span>
+        {showSeed && (
+          <span
+            id="seed"
+            className="h-10 flex items-center text-sm text-body-700 hover:text-primary-500 transition-colors duration-75 cursor-pointer"
+            title="Click to copy"
+            onClick={handleCopySeed}
+          >
+            seed: {seedString}
+            {seedCopied && ' (copied)'}
+          </span>
+        )}
         {onExit ? (
           <button
             type="button"
             aria-label="Menu"
             title="Menu"
             onClick={onExit}
-            className="size-10 -mr-2 flex items-center justify-center rounded-lg text-body-700 hover:text-primary-500 transition-colors duration-75 hover:cursor-pointer outline-offset-2 outline-body-700 focus:outline-2"
+            className="size-10 ml-auto -mr-2 flex items-center justify-center rounded-lg text-body-700 hover:text-primary-500 transition-colors duration-75 hover:cursor-pointer outline-offset-2 outline-body-700 focus:outline-2"
           >
             <svg
               viewBox="0 0 24 24"

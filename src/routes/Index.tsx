@@ -113,6 +113,7 @@ export const Index: FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...
           puzzle={puzzle}
           dateString={seedString}
           persist={mode === 'daily'}
+          showSeed={mode === 'zen'}
           onExit={() => changeScreen(() => setMenuOpen(true))}
           // Kept mounted but hidden while the menu is open, so progress is not lost
           className={twClassMerge(className, showLanding && 'hidden')}
