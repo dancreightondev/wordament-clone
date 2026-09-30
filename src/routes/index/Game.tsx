@@ -260,36 +260,34 @@ export const Game: FC<GameProps> = ({
       </header>
       {/* Objective and progress */}
       <div id="objective" className="text-center text-base mb-1 min-h-6" aria-live="polite">
-        {objectiveComplete ? (
+        {/* Only shown once complete: while in progress, a score objective is shown beside the score
+            and a word-count objective is shown as the counter above the list of words */}
+        {objectiveComplete && (
           <span className="text-primary-500 font-semibold">
             Objective complete! {countedWords.length} of {solution.size} words found.
           </span>
-        ) : (
-          // A score objective is shown beside the score itself, so needs no text here
-          objective.type === 'words' && (
-            <span>
-              Find {objective.target} words ({progress}/{objective.target})
-            </span>
-          )
         )}
       </div>
       <main className="flex flex-col items-center flex-1 w-full">
-        {/* Score and validity/selection message area */}
-        <div id="upper" className="w-full flex flex-col items-center mb-3 min-h-24 shrink-0">
-          <div className="relative flex items-center justify-center">
-            <Score
-              score={score}
-              target={objective.type === 'score' ? objective.target : undefined}
-              label="points"
-              animated={animate}
-            />
-            <ScoredPoints
-              points={lastScoredPoints}
-              visible={showScoredPoints}
-              animated={animate}
-              onDone={() => setShowScoredPoints(false)}
-            />
-          </div>
+        {/* Score (score objectives only) and validity/selection message area */}
+        <div
+          id="upper"
+          className={twClassMerge(
+            'w-full flex flex-col items-center mb-3 shrink-0',
+            objective.type === 'score' ? 'min-h-24' : 'min-h-8'
+          )}
+        >
+          {objective.type === 'score' && (
+            <div className="relative flex items-center justify-center">
+              <Score score={score} target={objective.target} label="points" animated={animate} />
+              <ScoredPoints
+                points={lastScoredPoints}
+                visible={showScoredPoints}
+                animated={animate}
+                onDone={() => setShowScoredPoints(false)}
+              />
+            </div>
+          )}
           {/* The message and the selection fade between each other */}
           <AnimatePresence mode="wait" initial={false}>
             {showVMsg ? (
@@ -374,6 +372,15 @@ export const Game: FC<GameProps> = ({
             Submit word
           </Button>
           <div id="submitted-words" className="w-full flex flex-col items-center">
+            {/* Hidden until a word is found, as the list says so when it is empty */}
+            {objective.type === 'words' && foundWords.length > 0 && (
+              <div className="mb-1 flex w-full max-w-sm justify-between text-sm text-body-400">
+                <span>
+                  {progress} / {objective.target} words found
+                </span>
+                <span>{score} pts total</span>
+              </div>
+            )}
             <ul
               className="space-y-1 w-full max-w-sm overflow-y-auto max-h-48 no-scrollbar"
               ref={(el) => {
