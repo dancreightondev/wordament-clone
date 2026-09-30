@@ -2,7 +2,7 @@
 
 A browser-based clone of the story mode of Microsoft Wordament. There is no time limit, no multiplayer and no ads. It is designed to be played on mobile first, and works on desktop too.
 
-**Play it here: https://wordament-clone.netlify.app/**
+**Play it here: <https://wordament-clone.netlify.app/>**
 
 ## Rules
 
