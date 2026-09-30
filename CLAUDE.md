@@ -1,4 +1,4 @@
-# Wordament Clone
+# Wordiac
 
 A browser-based clone of the story mode of Microsoft Wordament, played mobile-first (desktop also supported), with no ads. Live at https://wordament-clone.netlify.app/ (deployed by Netlify).
 

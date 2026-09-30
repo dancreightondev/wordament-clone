@@ -1,4 +1,4 @@
-# Wordament Clone
+# Wordiac
 
 A browser-based clone of the story mode of Microsoft Wordament. There is no time limit, no multiplayer and no ads. It is designed to be played on mobile first, and works on desktop too.
 

@@ -1,6 +1,6 @@
 {
-  "name": "Wordament Clone",
-  "short_name": "Wordament",
+  "name": "Wordiac",
+  "short_name": "Wordiac",
   "description": "A daily word-finding puzzle. Swipe across the letter grid to find words. No ads.",
   "start_url": "/",
   "scope": "/",

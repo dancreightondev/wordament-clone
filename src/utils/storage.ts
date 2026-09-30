@@ -1,4 +1,4 @@
-const foundWordsKey = (dateString: string) => `wordament:found:${dateString}`
+const foundWordsKey = (dateString: string) => `wordiac:found:${dateString}`
 
 /** Loads the words found on a given day. Returns an empty list if storage is unavailable or invalid. */
 export const loadFoundWords = (dateString: string): string[] => {
