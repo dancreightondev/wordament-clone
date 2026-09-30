@@ -11,7 +11,7 @@ import { countSelections, extendPath, isWithinTileCentre, toggleTile } from '~/u
 import { copyToClipboard } from '~/utils/clipboard'
 import { GRID_SIZE } from '~/utils/config'
 import { Puzzle } from '~/utils/daily'
-import { ObjectiveKind, deriveObjective, objectiveProgress, totalScore } from '~/utils/objectives'
+import { ObjectiveType, deriveObjective, objectiveProgress, totalScore } from '~/utils/objectives'
 import { loadFoundWords, saveFoundWords } from '~/utils/storage'
 import { twClassMerge } from '~/utils/tailwind'
 import { MessageTone, calculateWordScore, checkSubmission, isCommonWord } from '~/utils/word'
@@ -33,7 +33,7 @@ interface GameProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Whether to show the seed, which the daily puzzle hides as it is just the date. */
   showSeed?: boolean
   /** Whether the objective is a score or a number of words. */
-  objectiveKind: ObjectiveKind
+  objectiveType: ObjectiveType
   /** Called when the player asks to return to the landing page. */
   onExit?: () => void
 }
@@ -43,15 +43,15 @@ export const Game: FC<GameProps> = ({
   dateString,
   persist = true,
   showSeed = true,
-  objectiveKind,
+  objectiveType,
   onExit,
   className,
   ...props
 }) => {
   const { seedString, letters, solution } = puzzle
   const objective = useMemo(
-    () => deriveObjective(objectiveKind, solution),
-    [objectiveKind, solution]
+    () => deriveObjective(objectiveType, solution),
+    [objectiveType, solution]
   )
   const [seedCopied, setSeedCopied] = useState<boolean>(false)
   const seedCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -266,8 +266,8 @@ export const Game: FC<GameProps> = ({
           </span>
         ) : (
           <span>
-            {objective.kind === 'score' ? 'Score' : 'Find'} {objective.target}{' '}
-            {objective.kind === 'score' ? 'points' : 'words'} ({progress}/{objective.target})
+            {objective.type === 'score' ? 'Score' : 'Find'} {objective.target}{' '}
+            {objective.type === 'score' ? 'points' : 'words'} ({progress}/{objective.target})
           </span>
         )}
       </div>

@@ -1,9 +1,9 @@
 import { calculateWordScore } from '~/utils/word'
 
-export type ObjectiveKind = 'score' | 'words'
+export type ObjectiveType = 'score' | 'words'
 
 export interface Objective {
-  kind: ObjectiveKind
+  type: ObjectiveType
   target: number
 }
 
@@ -23,12 +23,12 @@ export const totalScore = (words: Iterable<string>): number => {
  * Derives an objective from the words that can be found on the grid.
  * The target is always at least 1 and never more than what is available.
  */
-export const deriveObjective = (kind: ObjectiveKind, solution: ReadonlySet<string>): Objective => {
-  const available = kind === 'score' ? totalScore(solution) : solution.size
-  const fraction = kind === 'score' ? SCORE_TARGET_FRACTION : WORDS_TARGET_FRACTION
-  return { kind, target: Math.min(available, Math.max(1, Math.round(available * fraction))) }
+export const deriveObjective = (type: ObjectiveType, solution: ReadonlySet<string>): Objective => {
+  const available = type === 'score' ? totalScore(solution) : solution.size
+  const fraction = type === 'score' ? SCORE_TARGET_FRACTION : WORDS_TARGET_FRACTION
+  return { type, target: Math.min(available, Math.max(1, Math.round(available * fraction))) }
 }
 
 /** The player's progress towards an objective, given the common words they have found. */
 export const objectiveProgress = (objective: Objective, foundCommonWords: string[]): number =>
-  objective.kind === 'score' ? totalScore(foundCommonWords) : foundCommonWords.length
+  objective.type === 'score' ? totalScore(foundCommonWords) : foundCommonWords.length
