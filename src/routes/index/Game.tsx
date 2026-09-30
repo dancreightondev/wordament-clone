@@ -1,4 +1,5 @@
 import { FC, useState, useEffect, useMemo, useRef } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Button } from '~/components/Button'
 import { LetterTile } from '~/routes/index/LetterTile'
 import { ScoredWord } from '~/routes/index/ScoredWord'
@@ -18,7 +19,15 @@ import {
 } from '~/utils/objectives'
 import { loadFoundWords, saveFoundWords } from '~/utils/storage'
 import { twClassMerge } from '~/utils/tailwind'
-import { calculateWordScore, checkWordValidity, isCommonWord } from '~/utils/word'
+import { MessageTone, calculateWordScore, checkSubmission, isCommonWord } from '~/utils/word'
+
+/** The text colour for each message tone. */
+const MESSAGE_TONE_CLASSES: Record<MessageTone, string> = {
+  error: 'text-tile-5',
+  warning: 'text-tile-4',
+  info: 'text-primary-500',
+  none: 'text-body-200' // make sure this matches index.css
+}
 
 interface GameProps extends React.HTMLAttributes<HTMLDivElement> {
   puzzle: Puzzle
@@ -68,6 +77,7 @@ export const Game: FC<GameProps> = ({
   // vMsg = validity message
   const [showVMsg, setShowVMsg] = useState<boolean>(false)
   const [vMsg, setVMsg] = useState<string>('')
+  const [vMsgTone, setVMsgTone] = useState<MessageTone>('error')
   const vMsgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Variables used to display score UI. Every accepted word is stored (so progress can be
@@ -168,8 +178,9 @@ export const Game: FC<GameProps> = ({
     setSelectedIndices((prev) => toggleTile(prev, tile, GRID_SIZE))
   }
 
-  const showMessage = (message: string) => {
+  const showMessage = (message: string, tone: MessageTone) => {
     setVMsg(message)
+    setVMsgTone(tone)
     // Show message for 3 seconds
     setShowVMsg(true)
     if (vMsgTimerRef.current) clearTimeout(vMsgTimerRef.current)
@@ -178,19 +189,17 @@ export const Game: FC<GameProps> = ({
 
   const handleSubmit = (path: number[] = selectedIndices) => {
     const word = path.map((i) => letters[i]).join('')
-    const wordValidity = checkWordValidity(word)
-    if (!wordValidity.isValid) {
-      showMessage(wordValidity.msg)
-    } else if (foundWords.includes(word)) {
-      showMessage(`${word} has already been scored`)
+    const result = checkSubmission(word, foundWords)
+    if (!result.accepted) {
+      showMessage(result.msg, result.tone)
     } else {
       setFoundWords((prev) => [...prev, word])
-      if (isCommonWord(word)) {
+      if (result.counted) {
         // Update scored points UI
         setLastScoredPoints(calculateWordScore(word))
         setShowScoredPoints(true)
       } else {
-        showMessage(`${word} is a valid word, but is too uncommon to count`)
+        showMessage(result.msg, result.tone)
       }
     }
 
@@ -271,25 +280,40 @@ export const Game: FC<GameProps> = ({
               onDone={() => setShowScoredPoints(false)}
             />
           </div>
-          {showVMsg ? (
-            <div
-              id="validity-message"
-              role="status"
-              className="flex flex-col items-center text-center space-y-4 mt-2"
-            >
-              {vMsg}
-            </div>
-          ) : (
-            <div
-              id="selection"
-              className="min-h-8 mt-2 flex items-center text-2xl font-semibold text-primary-500"
-              aria-label="Selected letters"
-            >
-              {selectedIndices.length > 0
-                ? selectedIndices.map((i) => letters[i]).join('')
-                : '\u00A0'}
-            </div>
-          )}
+          {/* The message and the selection fade between each other */}
+          <AnimatePresence mode="wait" initial={false}>
+            {showVMsg ? (
+              <motion.div
+                key="message"
+                id="validity-message"
+                role="status"
+                // Same size as the selection, so the layout does not jump
+                className={twClassMerge(
+                  'min-h-8 mt-2 flex items-center text-center text-xl font-semibold',
+                  MESSAGE_TONE_CLASSES[vMsgTone]
+                )}
+                initial={animate ? { opacity: 0, y: 6 } : undefined}
+                animate={animate ? { opacity: 1, y: 0 } : undefined}
+                exit={animate ? { opacity: 0, y: -6 } : undefined}
+                transition={{ duration: 0.15, ease: 'easeOut' }}
+              >
+                {vMsg}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="selection"
+                id="selection"
+                className="min-h-8 mt-2 flex items-center text-xl font-semibold text-primary-500"
+                aria-label="Selected letters"
+                initial={animate ? { opacity: 0 } : undefined}
+                animate={animate ? { opacity: 1 } : undefined}
+                exit={animate ? { opacity: 0 } : undefined}
+                transition={{ duration: 0.15 }}
+              >
+                {selectedIndices.length > 0 ? selectedIndices.map((i) => letters[i]).join('') : ' '}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         {/* Letter grid. The wrapper is a size container, so tile text scales with the grid width. */}
         <div className="@container w-full max-w-sm mx-auto mb-4 shrink-0">

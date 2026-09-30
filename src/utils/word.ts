@@ -72,24 +72,49 @@ export const getCommonTrie = (): Trie => (commonTrie ??= buildTrie(commonWordSet
 
 export const isCommonWord = (word: string): boolean => commonWordSet.has(word.toLowerCase())
 
-export type WordValidity = { isValid: true } | { isValid: false; msg: string }
+/**
+ * How a message should look, without saying how: `error` for a rejected word, `warning` for an
+ * accepted word that comes with a caveat. The UI maps tones to colours from the current theme.
+ */
+export type MessageTone = 'error' | 'warning' | 'info' | 'none'
 
-export const checkWordValidity = (word: string, minLength: number = 3): WordValidity => {
+export type SubmissionResult =
+  | { accepted: false; msg: string; tone: MessageTone }
+  | { accepted: true; counted: true }
+  | { accepted: true; counted: false; msg: string; tone: MessageTone }
+
+/**
+ * Decides what happens when a word is submitted. Rejected words (invalid or already found) are not
+ * accepted. Accepted words are added to the found words, but only common ones are counted towards
+ * the score and objective; the others come with a message saying so.
+ *
+ * @param foundWords - The words already accepted, in the same case as `word`.
+ */
+export const checkSubmission = (
+  word: string,
+  foundWords: readonly string[],
+  minLength: number = 3
+): SubmissionResult => {
   // Check word is non-empty
-  if (!word) return { isValid: false, msg: 'Cannot submit an empty word' }
+  if (!word) return { accepted: false, msg: 'Cannot submit an empty word', tone: 'error' }
   // Check word is minimum length, default 3
   if (word.length < minLength) {
-    return { isValid: false, msg: `${word} is too short to be a valid word` }
+    return { accepted: false, msg: `Too short`, tone: 'error' }
   }
   // Check word is NOT in rude words list
   if (rudeWordSet.has(word.toLowerCase())) {
-    return { isValid: false, msg: `${word} is considered profane or inappropriate` }
+    return { accepted: false, msg: `Profane or inappropriate`, tone: 'warning' }
   }
   // Check word is in the dictionary
   if (!wordSet.has(word.toLowerCase())) {
-    return { isValid: false, msg: `${word} is not a valid word` }
+    return { accepted: false, msg: `Not a word`, tone: 'error' }
   }
-  return { isValid: true }
+  // Check word has not already been found
+  if (foundWords.includes(word)) return { accepted: false, msg: 'Already scored', tone: 'warning' }
+  // Valid words are accepted, but only common ones count
+  if (!isCommonWord(word))
+    return { accepted: true, counted: false, msg: 'Uncommon word', tone: 'info' }
+  return { accepted: true, counted: true }
 }
 
 export const calculateWordScore = (word: string): number => {

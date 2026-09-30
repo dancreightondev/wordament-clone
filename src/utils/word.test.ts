@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
-import { calculateWordScore, checkWordValidity, isCommonWord, loadDictionary } from '~/utils/word'
+import { calculateWordScore, checkSubmission, isCommonWord, loadDictionary } from '~/utils/word'
 
 const files: Record<string, string> = {
   '/dictionary.txt': 'cat\ndog\nbadword\n',
@@ -17,25 +17,35 @@ beforeAll(async () => {
   await loadDictionary()
 })
 
-describe('checkWordValidity', () => {
-  it('accepts dictionary and custom words, ignoring case', () => {
-    expect(checkWordValidity('CAT')).toEqual({ isValid: true })
-    expect(checkWordValidity('DOOT')).toEqual({ isValid: true })
+describe('checkSubmission', () => {
+  it('accepts and counts new common words, ignoring case', () => {
+    expect(checkSubmission('CAT', [])).toEqual({ accepted: true, counted: true })
   })
 
-  it('rejects empty, short, unknown and rude words with a message', () => {
-    expect(checkWordValidity('')).toMatchObject({ isValid: false })
-    expect(checkWordValidity('CA')).toMatchObject({
-      isValid: false,
-      msg: expect.stringContaining('short')
+  it('accepts uncommon dictionary and custom words without counting them, with a warning', () => {
+    const uncommon = { accepted: true, counted: false, msg: 'Uncommon word', tone: 'warning' }
+    expect(checkSubmission('DOG', [])).toEqual(uncommon)
+    expect(checkSubmission('DOOT', [])).toEqual(uncommon)
+  })
+
+  it('rejects words that have already been found', () => {
+    const rejected = { accepted: false, msg: 'Already scored', tone: 'error' }
+    expect(checkSubmission('CAT', ['CAT'])).toEqual(rejected)
+    expect(checkSubmission('DOG', ['DOG'])).toEqual(rejected)
+  })
+
+  it('rejects empty, short, unknown and rude words with an error message', () => {
+    expect(checkSubmission('', [])).toMatchObject({ accepted: false, tone: 'error' })
+    expect(checkSubmission('CA', [])).toEqual({ accepted: false, msg: 'Too short', tone: 'error' })
+    expect(checkSubmission('XYZ', [])).toEqual({
+      accepted: false,
+      msg: 'Not a word',
+      tone: 'error'
     })
-    expect(checkWordValidity('XYZ')).toMatchObject({
-      isValid: false,
-      msg: expect.stringContaining('not a valid')
-    })
-    expect(checkWordValidity('BADWORD')).toMatchObject({
-      isValid: false,
-      msg: expect.stringContaining('profane')
+    expect(checkSubmission('BADWORD', [])).toEqual({
+      accepted: false,
+      msg: 'Profane or inappropriate',
+      tone: 'error'
     })
   })
 })
