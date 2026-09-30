@@ -12,11 +12,16 @@ A browser-based clone of the story mode of Microsoft Wordament. There is no time
 - There is a new puzzle every day (at midnight UK time), the same for everybody. Each day has an objective, either reaching a score or finding a number of words, worked out from the words that can be found on that day's grid.
 - Only reasonably common words score or count towards the objective. Less common dictionary words are accepted, but not counted.
 
+## Modes
+
+The landing page lets you choose between two modes. The menu button in the top right returns to it mid-game, and the X button resumes where you left off.
+
+- **Daily puzzle**: the same grid for everybody each day, resetting at midnight UK time. Your progress is saved in your browser.
+- **Zen mode**: untimed, with a random grid each time.
+
 ## Planned
 
-- A landing page to choose between the **Daily puzzle** and **Zen mode**.
 - **Daily puzzle**: timed (10 minutes), with a leaderboard of scores.
-- **Zen mode**: untimed, with a random grid each time.
 
 ## Development
 
