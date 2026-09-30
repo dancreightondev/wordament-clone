@@ -24,9 +24,20 @@ interface GameProps extends React.HTMLAttributes<HTMLDivElement> {
   puzzle: Puzzle
   /** The date the puzzle is for, used to store progress. */
   dateString: string
+  /** Whether to save and restore found words. Zen mode games are not persisted. */
+  persist?: boolean
+  /** Called when the player asks to return to the landing page. */
+  onExit?: () => void
 }
 
-export const Game: FC<GameProps> = ({ puzzle, dateString, className, ...props }) => {
+export const Game: FC<GameProps> = ({
+  puzzle,
+  dateString,
+  persist = true,
+  onExit,
+  className,
+  ...props
+}) => {
   const { seedString, letters, solution } = puzzle
   const objective = useMemo(
     () => deriveObjective(objectiveKindForDate(dateString), solution),
@@ -60,8 +71,10 @@ export const Game: FC<GameProps> = ({ puzzle, dateString, className, ...props })
   const vMsgTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Variables used to display score UI. Every accepted word is stored (so progress can be
-  // restored), but only common words are counted towards the score and objective.
-  const [foundWords, setFoundWords] = useState<string[]>(() => loadFoundWords(dateString))
+  // restored), but only common words are counted towards the score and objective
+  const [foundWords, setFoundWords] = useState<string[]>(() =>
+    persist ? loadFoundWords(dateString) : []
+  )
   const countedWords = useMemo(() => foundWords.filter(isCommonWord), [foundWords])
   const score = totalScore(countedWords)
   const progress = objectiveProgress(objective, countedWords)
@@ -74,7 +87,9 @@ export const Game: FC<GameProps> = ({ puzzle, dateString, className, ...props })
   const animate = !usePrefersReducedMotion()
 
   // Persist progress
-  useEffect(() => saveFoundWords(dateString, foundWords), [dateString, foundWords])
+  useEffect(() => {
+    if (persist) saveFoundWords(dateString, foundWords)
+  }, [persist, dateString, foundWords])
 
   const handleCopySeed = async () => {
     if (!(await copyToClipboard(seedString))) return
@@ -200,14 +215,36 @@ export const Game: FC<GameProps> = ({ puzzle, dateString, className, ...props })
       <header className="flex justify-between items-center mb-1">
         <span
           id="seed"
-          className="text-sm text-body-700 cursor-pointer"
+          className="h-10 flex items-center text-sm text-body-700 hover:text-primary-500 transition-colors duration-75 cursor-pointer"
           title="Click to copy"
           onClick={handleCopySeed}
         >
           seed: {seedString}
           {seedCopied && ' (copied)'}
         </span>
-        <span>{/* menu button or settings toggle here */}</span>
+        {onExit ? (
+          <button
+            type="button"
+            aria-label="Menu"
+            title="Menu"
+            onClick={onExit}
+            className="size-10 -mr-2 flex items-center justify-center rounded-lg text-body-700 hover:text-primary-500 transition-colors duration-75 hover:cursor-pointer outline-offset-2 outline-body-700 focus:outline-2"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        ) : (
+          <span />
+        )}
       </header>
       {/* Objective and progress */}
       <div id="objective" className="text-center text-base mb-1" aria-live="polite">

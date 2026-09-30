@@ -14,9 +14,9 @@ A browser-based clone of the story mode of Microsoft Wordament. There is no time
 
 ## Planned
 
-- A landing page to choose between the **Daily puzzle** and **Practice**.
+- A landing page to choose between the **Daily puzzle** and **Zen mode**.
 - **Daily puzzle**: timed (10 minutes), with a leaderboard of scores.
-- **Practice**: untimed, with a random grid each time.
+- **Zen mode**: untimed, with a random grid each time.
 
 ## Development
 

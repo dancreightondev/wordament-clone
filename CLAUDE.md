@@ -39,8 +39,8 @@ Run lint, typecheck, tests and the build before pushing.
 
 ## Product direction (planned, not yet built)
 
-- **Landing page** where the player chooses between the **Daily puzzle** and **Practice**.
+- **Landing page** where the player chooses between the **Daily puzzle** and **Zen mode**.
 - **Daily puzzle**: the same grid for everyone each UK day, **timed at 10 minutes**, with a **leaderboard of scores**. The leaderboard needs a backend or hosted service and some thought about cheating; it has not been designed.
-- **Practice**: untimed, random seed (`generateSeedString` in `src/utils/seed.ts`), no leaderboard. Today's untimed game is the starting point for this mode.
+- **Zen mode**: untimed, random seed (`generateSeedString` in `src/utils/seed.ts`), no leaderboard. Today's untimed game is the starting point for this mode.
 - The daily format is inspired by NYT Games and Bloobi.
 - Other planned work: streaks and share text, settings UI (animations, dyslexic mode and so on; the types exist in `src/types/settings.ts`), offline support (service worker), story-mode style levels.
