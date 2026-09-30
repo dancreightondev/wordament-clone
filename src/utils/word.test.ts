@@ -22,14 +22,14 @@ describe('checkSubmission', () => {
     expect(checkSubmission('CAT', [])).toEqual({ accepted: true, counted: true })
   })
 
-  it('accepts uncommon dictionary and custom words without counting them, with a warning', () => {
-    const uncommon = { accepted: true, counted: false, msg: 'Uncommon word', tone: 'warning' }
+  it('accepts uncommon dictionary and custom words without counting them', () => {
+    const uncommon = { accepted: true, counted: false, msg: 'Uncommon word', tone: 'info' }
     expect(checkSubmission('DOG', [])).toEqual(uncommon)
     expect(checkSubmission('DOOT', [])).toEqual(uncommon)
   })
 
   it('rejects words that have already been found', () => {
-    const rejected = { accepted: false, msg: 'Already scored', tone: 'error' }
+    const rejected = { accepted: false, msg: 'Already scored', tone: 'warning' }
     expect(checkSubmission('CAT', ['CAT'])).toEqual(rejected)
     expect(checkSubmission('DOG', ['DOG'])).toEqual(rejected)
   })
@@ -45,7 +45,7 @@ describe('checkSubmission', () => {
     expect(checkSubmission('BADWORD', [])).toEqual({
       accepted: false,
       msg: 'Profane or inappropriate',
-      tone: 'error'
+      tone: 'warning'
     })
   })
 })
