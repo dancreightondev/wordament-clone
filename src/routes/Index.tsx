@@ -114,6 +114,8 @@ export const Index: FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...
           dateString={seedString}
           persist={mode === 'daily'}
           showSeed={mode === 'zen'}
+          // The daily puzzle is score-based, and zen mode is word-count-based
+          objectiveKind={mode === 'daily' ? 'score' : 'words'}
           onExit={() => changeScreen(() => setMenuOpen(true))}
           // Kept mounted but hidden while the menu is open, so progress is not lost
           className={twClassMerge(className, showLanding && 'hidden')}

@@ -29,7 +29,7 @@ Run lint, typecheck, tests and the build before pushing.
 - Tiles are adjacent (including diagonals) and **may be re-used** within a word, but not twice in a row.
 - Words need at least three letters and must be in the dictionary. Only **common** words score and count towards the objective; other valid words are accepted but not counted.
 - The daily puzzle is seeded by the UK date (`Europe/London`), so everyone gets the same grid. Grids with too few common words are rejected deterministically.
-- Objectives (score N or find N words) are a fraction of what the solver finds on the grid.
+- Objectives are a fraction of what the solver finds on the grid. The daily puzzle's objective is to reach a **score**, and zen mode's is to find a **number of words**.
 
 ## Conventions
 

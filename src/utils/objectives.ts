@@ -1,4 +1,3 @@
-import { hashCode } from '~/utils/number'
 import { calculateWordScore } from '~/utils/word'
 
 export type ObjectiveKind = 'score' | 'words'
@@ -19,10 +18,6 @@ export const totalScore = (words: Iterable<string>): number => {
   for (const word of words) total += calculateWordScore(word)
   return total
 }
-
-/** Chooses which kind of objective a given date has. Stable for a given date. */
-export const objectiveKindForDate = (dateString: string): ObjectiveKind =>
-  Math.abs(hashCode(dateString)) % 2 === 0 ? 'score' : 'words'
 
 /**
  * Derives an objective from the words that can be found on the grid.

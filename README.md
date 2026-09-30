@@ -9,7 +9,7 @@ A browser-based clone of the story mode of Microsoft Wordament. There is no time
 - Tap adjacent tiles (including diagonals) to spell a word, then submit it.
 - Tiles may be re-used within a single word.
 - Words must be at least three letters long and appear in the dictionary.
-- There is a new puzzle every day (at midnight UK time), the same for everybody. Each day has an objective, either reaching a score or finding a number of words, worked out from the words that can be found on that day's grid.
+- There is a new puzzle every day (at midnight UK time), the same for everybody. The daily puzzle's objective is to reach a target score, and zen mode's is to find a number of words. Both targets are worked out from the words that can be found on that grid.
 - Only reasonably common words score or count towards the objective. Less common dictionary words are accepted, but not counted.
 
 ## Modes
