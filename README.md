@@ -17,7 +17,7 @@ A browser-based clone of the story mode of Microsoft Wordament. There is no time
 The landing page lets you choose between two modes. The menu button in the top right returns to it mid-game, and the X button resumes where you left off.
 
 - **Daily puzzle**: the same grid for everybody each day, resetting at midnight UK time. Your progress is saved in your browser.
-- **Zen mode**: untimed, with a random grid each time.
+- **Zen mode**: untimed, with a random grid each time. Add `?seed=<seed>` to the URL to play a specific grid, for example `/?seed=12345`. Starting a zen game puts its seed in the URL, so you can copy it to share the puzzle.
 
 ## Planned
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LCRNG_MODULUS, lcrng } from '~/utils/number'
-import { generateSeedString, stringToSeed } from '~/utils/seed'
+import { generateSeedString, getSeedFromSearch, stringToSeed } from '~/utils/seed'
 
 describe('stringToSeed', () => {
   it('keeps ordinary numeric seeds unchanged', () => {
@@ -45,5 +45,20 @@ describe('lcrng', () => {
 describe('generateSeedString', () => {
   it('returns a numeric string of at most eight digits', () => {
     expect(generateSeedString()).toMatch(/^\d{1,8}$/)
+  })
+})
+
+describe('getSeedFromSearch', () => {
+  it('reads the seed parameter', () => {
+    expect(getSeedFromSearch('?seed=12345')).toBe('12345')
+    expect(getSeedFromSearch('?other=1&seed=hello%20world')).toBe('hello world')
+  })
+
+  it('returns null when there is no usable seed', () => {
+    expect(getSeedFromSearch('')).toBeNull()
+    expect(getSeedFromSearch('?other=1')).toBeNull()
+    expect(getSeedFromSearch('?seed=')).toBeNull()
+    expect(getSeedFromSearch('?seed=%20%20')).toBeNull()
+    expect(getSeedFromSearch(`?seed=${'x'.repeat(65)}`)).toBeNull()
   })
 })

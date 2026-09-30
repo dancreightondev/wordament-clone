@@ -3,20 +3,30 @@ import { Button } from '~/components/Button'
 import { Game } from '~/routes/index/Game'
 import { GRID_SIZE, VOWEL_COUNT } from '~/utils/config'
 import { usePrefersReducedMotion } from '~/utils/motion'
-import { generateSeedString } from '~/utils/seed'
+import { SEED_PARAM, generateSeedString, getSeedFromSearch } from '~/utils/seed'
 import { generateDailyPuzzle, getDailyDateString } from '~/utils/daily'
 import { twClassMerge } from '~/utils/tailwind'
 import { getCommonTrie, loadDictionary } from '~/utils/word'
 
 const FADE_MS = 200
 
+/** Keeps the address bar as a shareable link to a zen game, and clears it for anything else. */
+const setSeedInUrl = (seed: string | null) => {
+  const url = new URL(window.location.href)
+  if (seed) url.searchParams.set(SEED_PARAM, seed)
+  else url.searchParams.delete(SEED_PARAM)
+  window.history.replaceState(null, '', url)
+}
+
 export const Index: FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...props }) => {
   const [dateString] = useState<string>(getDailyDateString)
-  // The game in progress, if any. Zen games use a random seed, chosen when the game starts.
-  const [mode, setMode] = useState<'daily' | 'zen' | null>(null)
+  // A link with a seed (`?seed=...`) opens that zen game directly
+  const [linkedSeed] = useState<string | null>(() => getSeedFromSearch(window.location.search))
+  // The game in progress, if any. Zen games use a random seed unless one was linked to.
+  const [mode, setMode] = useState<'daily' | 'zen' | null>(linkedSeed ? 'zen' : null)
   // The landing page doubles as the menu: opening it keeps the game mounted, so it can be resumed
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
-  const [zenSeed, setZenSeed] = useState<string>('')
+  const [zenSeed, setZenSeed] = useState<string>(linkedSeed ?? '')
 
   // Changing screens fades the current one out, switches, then fades the new one in
   const animate = !usePrefersReducedMotion()
@@ -79,11 +89,14 @@ export const Index: FC<React.HTMLAttributes<HTMLDivElement>> = ({ className, ...
   const startDaily = () =>
     changeScreen(() => {
       setMode('daily')
+      setSeedInUrl(null)
       setMenuOpen(false)
     })
   const startZen = () =>
     changeScreen(() => {
-      setZenSeed(generateSeedString())
+      const seed = generateSeedString()
+      setZenSeed(seed)
+      setSeedInUrl(seed)
       setMode('zen')
       setMenuOpen(false)
     })

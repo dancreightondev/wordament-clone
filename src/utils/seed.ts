@@ -31,3 +31,17 @@ export const generateSeedString = (): string => {
   const [random] = crypto.getRandomValues(new Uint32Array(1))
   return (random % 100000000).toString()
 }
+
+/** The query string parameter that holds the seed of a shared zen mode puzzle. */
+export const SEED_PARAM = 'seed'
+
+const MAX_SEED_LENGTH = 64
+
+/**
+ * Reads the seed from a URL query string (for example `?seed=12345`), so that a link can open a
+ * specific zen mode puzzle. Returns `null` if there is no usable seed.
+ */
+export const getSeedFromSearch = (search: string): string | null => {
+  const seed = new URLSearchParams(search).get(SEED_PARAM)?.trim()
+  return seed && seed.length <= MAX_SEED_LENGTH ? seed : null
+}
