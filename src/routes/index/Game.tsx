@@ -259,23 +259,30 @@ export const Game: FC<GameProps> = ({
         )}
       </header>
       {/* Objective and progress */}
-      <div id="objective" className="text-center text-base mb-1" aria-live="polite">
+      <div id="objective" className="text-center text-base mb-1 min-h-6" aria-live="polite">
         {objectiveComplete ? (
           <span className="text-primary-500 font-semibold">
             Objective complete! {countedWords.length} of {solution.size} words found.
           </span>
         ) : (
-          <span>
-            {objective.type === 'score' ? 'Score' : 'Find'} {objective.target}{' '}
-            {objective.type === 'score' ? 'points' : 'words'} ({progress}/{objective.target})
-          </span>
+          // A score objective is shown beside the score itself, so needs no text here
+          objective.type === 'words' && (
+            <span>
+              Find {objective.target} words ({progress}/{objective.target})
+            </span>
+          )
         )}
       </div>
       <main className="flex flex-col items-center flex-1 w-full">
         {/* Score and validity/selection message area */}
         <div id="upper" className="w-full flex flex-col items-center mb-3 min-h-24 shrink-0">
           <div className="relative flex items-center justify-center">
-            <Score score={score} animated={animate} />
+            <Score
+              score={score}
+              target={objective.type === 'score' ? objective.target : undefined}
+              label="points"
+              animated={animate}
+            />
             <ScoredPoints
               points={lastScoredPoints}
               visible={showScoredPoints}
