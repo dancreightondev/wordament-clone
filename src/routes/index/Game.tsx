@@ -226,7 +226,10 @@ export const Game: FC<GameProps> = ({
 
   return (
     <div
-      className={twClassMerge('flex flex-col min-h-dvh max-w-md mx-auto px-4 pt-3 pb-6', className)}
+      className={twClassMerge(
+        'flex flex-col h-dvh max-w-md short:max-w-3xl mx-auto px-4 pt-3 pb-6 short:pt-2 short:pb-2',
+        className
+      )}
       {...props}
     >
       {/* Header with seed and (future) menu */}
@@ -276,12 +279,12 @@ export const Game: FC<GameProps> = ({
           </span>
         )}
       </div>
-      <main className="flex flex-col items-center flex-1 w-full">
+      <main className="flex flex-col items-center flex-1 min-h-0 w-full short:grid short:items-start short:grid-cols-2 short:grid-rows-[auto_minmax(0,1fr)] short:gap-x-6">
         {/* Score (score objectives only) and validity/selection message area */}
         <div
           id="upper"
           className={twClassMerge(
-            'w-full flex flex-col items-center mb-3 shrink-0',
+            'w-full flex flex-col items-center mb-3 shrink-0 short:col-start-2 short:row-start-1 short:mb-2',
             objective.type === 'score' ? 'min-h-24' : 'min-h-8'
           )}
         >
@@ -332,7 +335,7 @@ export const Game: FC<GameProps> = ({
           </AnimatePresence>
         </div>
         {/* Letter grid. The wrapper is a size container, so tile text scales with the grid width. */}
-        <div className="@container w-full max-w-sm mx-auto mb-4 shrink-0">
+        <div className="@container w-full max-w-sm mx-auto mb-4 shrink-0 short:col-start-1 short:row-start-1 short:row-span-2 short:h-full short:w-auto short:max-w-none short:aspect-square short:mb-0 short:justify-self-center">
           <div
             id="tiles"
             ref={gridRef}
@@ -372,17 +375,20 @@ export const Game: FC<GameProps> = ({
           </div>
         </div>
         {/* Lower section: submit button and scored words */}
-        <div id="lower" className="flex flex-col items-center w-full space-y-3 shrink-0">
+        <div
+          id="lower"
+          className="flex flex-col items-center w-full space-y-3 flex-1 min-h-0 short:col-start-2 short:row-start-2 short:space-y-2"
+        >
           <Button
             onClick={() => handleSubmit()}
-            className="w-full max-w-sm min-h-11 justify-center"
+            className="w-full max-w-sm min-h-11 justify-center shrink-0"
           >
             Submit word
           </Button>
-          <div id="submitted-words" className="w-full flex flex-col items-center">
+          <div id="submitted-words" className="w-full flex flex-col items-center flex-1 min-h-0">
             {/* Hidden until a word is found, as the list says so when it is empty */}
             {objective.type === 'words' && foundWords.length > 0 && (
-              <div className="mb-1 flex w-full max-w-sm justify-between text-sm text-body-400">
+              <div className="mb-1 flex w-full max-w-sm shrink-0 justify-between text-sm text-body-400">
                 <span>
                   {/* Keyed by value, so it pops each time the number changes */}
                   <span
@@ -405,7 +411,7 @@ export const Game: FC<GameProps> = ({
             <MotionConfig reducedMotion="user">
               <ul
                 // Smooth scrolling, as the list scrolls back to the top when a word is added
-                className="space-y-1 w-full max-w-sm overflow-y-auto max-h-48 no-scrollbar scroll-smooth motion-reduce:scroll-auto"
+                className="space-y-1 w-full max-w-sm overflow-y-auto flex-1 min-h-0 no-scrollbar scroll-smooth motion-reduce:scroll-auto"
                 ref={wordListRef}
               >
                 {foundWords.length === 0 ? (

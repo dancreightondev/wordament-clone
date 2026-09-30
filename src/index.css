@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @reference "~/theme.css";
 
+/* A phone held sideways: wide but short, so the game switches to two columns to fit the height */
+@custom-variant short (@media (orientation: landscape) and (max-height: 32rem));
+
 @layer base {
   #root {
     @apply h-full;
